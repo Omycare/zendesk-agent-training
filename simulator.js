@@ -98,7 +98,6 @@ function renderTicketScene(setup, L) {
 
     <!-- LEFT PROPS PANEL -->
     <div class="zd-props" id="zd-props">
-      <div class="zd-props-scroll">
       <div class="zd-prop-group">
         <div class="zd-prop-label">${L==='fr'?'Marque':'Brand'}</div>
         <div class="zd-prop-field" id="field-brand">
@@ -156,7 +155,6 @@ function renderTicketScene(setup, L) {
           <div class="zd-tag">sentiment__neutral <span class="tag-x">×</span></div>
         </div>
       </div>
-      </div><!-- end zd-props-scroll -->
       <!-- Macro footer — sticky at bottom of sidebar -->
       <div class="zd-macro-footer">
         <div style="position:relative">
