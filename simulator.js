@@ -53,12 +53,29 @@ function renderTicketScene(setup, L) {
     : `Submit as ${statusMap[s.status]||'Open'}`;
 
   const defaultMacros = [
-    { icon:'📧', name: L==='fr'?'Accusé de réception':'Acknowledgment' },
-    { icon:'✅', name: L==='fr'?'Résolution standard':'Standard resolution' },
-    { icon:'⏳', name: L==='fr'?'En attente d\'information':'Awaiting information' },
-    { icon:'🔄', name: L==='fr'?'Escalade Niveau 2':'Level 2 escalation' },
+    { icon:'🔑', name: L==='fr'?'Réinitialisation mot de passe':'Password reset',
+      actions:[
+        {type:'reply', text:{fr:'Bonjour,\n\nPour réinitialiser votre mot de passe :\n1. Rendez-vous sur la page de connexion\n2. Cliquez sur "Mot de passe oublié"\n3. Entrez votre adresse email et suivez les instructions\n\nN\'hésitez pas à nous contacter si besoin.\n\nCordialement,\nL\'équipe OmyCare', en:'Hello,\n\nTo reset your password:\n1. Go to the login page\n2. Click "Forgot password"\n3. Enter your email address and follow the instructions\n\nFeel free to contact us if you need further help.\n\nBest regards,\nThe OmyCare team'}},
+        {type:'status', value:'pending'}
+      ]},
+    { icon:'⏳', name: L==='fr'?'Client n\'a pas répondu':'Customer hasn\'t responded',
+      actions:[
+        {type:'reply', text:{fr:'Bonjour,\n\nNous n\'avons pas eu de vos nouvelles depuis quelques jours. Votre demande est-elle toujours d\'actualité ?\n\nSans retour de votre part sous 48h, nous clôturerons ce ticket.\n\nCordialement,\nL\'équipe OmyCare', en:'Hello,\n\nWe have not heard from you in a few days. Is your request still relevant?\n\nWithout a reply within 48h, we will close this ticket.\n\nBest regards,\nThe OmyCare team'}},
+        {type:'status', value:'pending'}
+      ]},
+    { icon:'✅', name: L==='fr'?'Résolution standard':'Standard resolution',
+      actions:[
+        {type:'reply', text:{fr:'Bonjour,\n\nNous espérons que votre problème est à présent résolu. N\'hésitez pas à nous recontacter si vous avez d\'autres questions.\n\nCordialement,\nL\'équipe OmyCare', en:'Hello,\n\nWe hope your issue is now resolved. Please do not hesitate to contact us again if you have any further questions.\n\nBest regards,\nThe OmyCare team'}},
+        {type:'status', value:'solved'}
+      ]},
+    { icon:'🔄', name: L==='fr'?'Escalade Niveau 2':'Level 2 escalation',
+      actions:[
+        {type:'internal', text:{fr:'Ce ticket nécessite une expertise technique approfondie — escalade vers le support Niveau 2.', en:'This ticket requires deep technical expertise — escalating to Level 2 support.'}},
+        {type:'priority', value:'high'}
+      ]},
   ];
-  const macros = s.macros.length ? s.macros : defaultMacros;
+  const macros = (s.macros && s.macros.length) ? s.macros : defaultMacros;
+  window._simMacros = macros;
 
   const defaultMessages = [
     {
@@ -81,6 +98,7 @@ function renderTicketScene(setup, L) {
 
     <!-- LEFT PROPS PANEL -->
     <div class="zd-props" id="zd-props">
+      <div class="zd-props-scroll">
       <div class="zd-prop-group">
         <div class="zd-prop-label">${L==='fr'?'Marque':'Brand'}</div>
         <div class="zd-prop-field" id="field-brand">
@@ -138,16 +156,22 @@ function renderTicketScene(setup, L) {
           <div class="zd-tag">sentiment__neutral <span class="tag-x">×</span></div>
         </div>
       </div>
-      <!-- Macro button with dropdown -->
-      <div style="position:relative;margin-top:8px" id="macro-wrap">
-        <button class="zd-macro-btn" id="macro-btn" onclick="toggleMacroDropdown()">
-          <span class="macro-icon">⚡</span>
-          <span>${L==='fr'?'Appliquer une macro':'Apply macro'}</span>
-          <span class="macro-arr">▴</span>
-        </button>
-        <div class="zd-macro-dropdown" id="macro-dropdown">
-          <div class="zd-macro-search"><input type="text" placeholder="${L==='fr'?'Rechercher...':'Search...'}"></div>
-          ${macros.map((m,i)=>`<div class="zd-macro-item" id="macro-item-${i}" onclick="simMacroSelect('${m.name}', ${i})">${m.icon} ${m.name}</div>`).join('')}
+      </div><!-- end zd-props-scroll -->
+      <!-- Macro footer — sticky at bottom of sidebar -->
+      <div class="zd-macro-footer">
+        <div style="position:relative">
+          <button class="zd-macro-btn" id="macro-btn" onclick="toggleMacroDropdown()">
+            <span class="macro-icon">⚡</span>
+            <span id="macro-btn-label">${L==='fr'?'Appliquer une macro':'Apply macro'}</span>
+            <span class="macro-arr">▴</span>
+          </button>
+          <div class="zd-macro-dropdown" id="macro-dropdown">
+            <div class="zd-macro-search">
+              <input type="text" id="macro-search-input" placeholder="${L==='fr'?'Rechercher une macro...':'Search for a macro...'}" oninput="filterMacros(this.value)" autocomplete="off">
+            </div>
+            ${macros.map((m,i)=>`<div class="zd-macro-item" id="macro-item-${i}" onclick="simMacroSelect('${m.name}', ${i})">${m.icon} ${m.name}</div>`).join('')}
+            <div class="zd-macro-create" onclick="simAction('create-macro')">${L==='fr'?'+ Créer une macro':'+ Create a macro'}</div>
+          </div>
         </div>
       </div>
     </div>
@@ -882,16 +906,74 @@ function simSubmitAs(status) {
 function simMacroSelect(name, idx) {
   const ex = window._simExercise;
   if (!ex || window._simAnswered) return;
-  document.getElementById('macro-dropdown').classList.remove('open');
+  const dd = document.getElementById('macro-dropdown');
+  if (dd) dd.classList.remove('open');
+
+  // Apply macro actions visually
+  const macro = (window._simMacros || [])[idx];
+  const L = window._simL;
+  if (macro && macro.actions) {
+    macro.actions.forEach(action => {
+      if (action.type === 'reply' || action.type === 'internal') {
+        const ta = document.getElementById('zd-reply-area');
+        const modeBtn = document.getElementById('mode-btn');
+        const modeIcon = document.getElementById('mode-icon');
+        const modeLabel = document.getElementById('mode-label');
+        const text = typeof action.text === 'object' ? (action.text[L] || action.text.fr) : action.text;
+        if (ta) { ta.value = text; }
+        if (action.type === 'internal') {
+          if (modeBtn) modeBtn.classList.add('internal-mode');
+          if (modeIcon) modeIcon.textContent = '🔒';
+          if (modeLabel) modeLabel.textContent = L==='fr'?'Note interne':'Internal note';
+          if (ta) { ta.classList.add('internal-bg'); ta.placeholder = L==='fr'?'Note interne...':'Internal note...'; }
+        } else {
+          if (modeBtn) modeBtn.classList.remove('internal-mode');
+          if (modeIcon) modeIcon.textContent = '↩';
+          if (modeLabel) modeLabel.textContent = L==='fr'?'Réponse publique':'Public reply';
+          if (ta) { ta.classList.remove('internal-bg'); }
+        }
+      } else if (action.type === 'status') {
+        const submitBtn = document.getElementById('submit-btn');
+        const labels = {open:L==='fr'?'Ouvert':'Open', pending:L==='fr'?'En attente':'Pending', solved:L==='fr'?'Résolu':'Solved'};
+        if (submitBtn) submitBtn.textContent = (L==='fr'?'Soumettre comme ':'Submit as ') + (labels[action.value]||action.value);
+      } else if (action.type === 'priority') {
+        const sel = document.getElementById('field-priority');
+        if (sel) sel.value = action.value;
+      }
+    });
+    // Toast notification
+    const simArea = document.getElementById('zd-sim-area');
+    if (simArea) {
+      const toast = document.createElement('div');
+      toast.style.cssText = 'position:absolute;top:10px;left:50%;transform:translateX(-50%);background:#2F3941;color:white;padding:6px 18px;border-radius:20px;font-size:11px;z-index:200;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.25);pointer-events:none';
+      toast.textContent = (L==='fr'?'✓ Macro appliquée : ':'✓ Macro applied: ') + macro.name;
+      simArea.style.position = 'relative';
+      simArea.appendChild(toast);
+      setTimeout(() => toast.remove(), 2500);
+    }
+  }
+
   const target = ex.target;
-  const correct = target.action === 'apply-macro' && (target.macroIndex === idx || !target.macroIndex);
+  const correct = target.action === 'apply-macro' && (target.macroIndex === idx || target.macroIndex === undefined);
   _simHandleResult(correct, ex);
+}
+
+function filterMacros(val) {
+  const q = (val || '').toLowerCase();
+  document.querySelectorAll('.zd-macro-item').forEach(el => {
+    el.style.display = el.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
 }
 
 function toggleMacroDropdown() {
   const dd = document.getElementById('macro-dropdown');
-  if (dd) dd.classList.toggle('open');
-  // Check if just opening counts as the exercise action
+  if (!dd) return;
+  const willOpen = !dd.classList.contains('open');
+  dd.classList.toggle('open');
+  if (willOpen) {
+    const inp = document.getElementById('macro-search-input');
+    if (inp) { inp.value = ''; filterMacros(''); setTimeout(()=>inp.focus(), 50); }
+  }
   const ex = window._simExercise;
   if (ex && ex.target && ex.target.action === 'open-macro' && !window._simAnswered) {
     _simHandleResult(true, ex);

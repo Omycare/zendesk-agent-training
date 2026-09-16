@@ -239,12 +239,12 @@ const MODULES = [
       exercise:{
         type:'sim',
         scene:'ticket',
-        instruction:{fr:"Ce client demande comment réinitialiser son mot de passe. Cliquez sur '⚡ Appliquer une macro' en bas du panneau gauche pour ouvrir la liste des macros.",en:"This customer is asking how to reset their password. Click '⚡ Apply macro' at the bottom of the left panel to open the macro list."},
+        instruction:{fr:"Ce client demande comment réinitialiser son mot de passe. Cliquez sur ⚡ en bas du panneau gauche, puis sélectionnez la macro '🔑 Réinitialisation mot de passe'.",en:"This customer is asking how to reset their password. Click ⚡ at the bottom of the left panel, then select the '🔑 Password reset' macro."},
         setup:{ subject:'Comment réinitialiser mon mot de passe ?', requester:'Sophie Bernard', status:'open', type:'question' },
-        target:{ action:'open-macro', element:'macro-btn' },
+        target:{ action:'apply-macro', element:'macro-btn', macroIndex:0 },
         feedback:{
-          correct:{fr:'Bien ! La liste des macros est ouverte. En conditions réelles, vous sélectionneriez la macro correspondante pour insérer automatiquement la réponse et changer le statut.',en:'Well done! The macro list is open. In real conditions, you would select the matching macro to automatically insert the response and change the status.'},
-          wrong:{fr:'Cherchez le bouton ⚡ "Appliquer une macro" tout en bas du panneau gauche.',en:'Look for the ⚡ "Apply macro" button at the very bottom of the left panel.'}
+          correct:{fr:'Parfait ! La macro a rempli automatiquement la réponse et mis le statut en Pending. Sophie recevra les instructions par email.',en:'Perfect! The macro automatically filled in the reply and set the status to Pending. Sophie will receive the instructions by email.'},
+          wrong:{fr:'Ouvrez la liste avec le bouton ⚡ et sélectionnez \'Réinitialisation mot de passe\'.',en:'Open the list with the ⚡ button and select \'Password reset\'.'}
         }
       }
     },
