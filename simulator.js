@@ -280,10 +280,6 @@ function renderTicketScene(setup, L) {
                 <span class="zd-status-pill sp-hold" style="font-size:10px">On-hold</span>
                 <span class="opt-status">${L==='fr'?'Soumettre comme En pause':'Submit as On-hold'}</span>
               </div>
-              <div style="height:1px;background:#D8DCDE;margin:4px 0"></div>
-              <div class="zd-submit-opt danger" onclick="simAction('mark-spam')">
-                🚫 ${L==='fr'?'Marquer comme spam':'Mark as spam'}
-              </div>
             </div>
           </div>
         </div>
