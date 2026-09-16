@@ -163,9 +163,12 @@
   border-right: 1px solid #D8DCDE;
   display: flex;
   flex-direction: column;
+  height: 100%;
+  overflow: hidden;
 }
 .zd-props-scroll {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
   padding: 12px 0;
 }
