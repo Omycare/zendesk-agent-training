@@ -152,8 +152,8 @@
 .zd-ticket-layout {
   display: grid;
   grid-template-columns: 240px 1fr 260px;
-  min-height: 400px;
-  height: 460px;
+  min-height: 360px;
+  height: 380px;
   overflow: hidden;
 }
 
