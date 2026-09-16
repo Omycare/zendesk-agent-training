@@ -933,7 +933,7 @@ function simMacroSelect(name, idx) {
           if (ta) { ta.classList.remove('internal-bg'); }
         }
       } else if (action.type === 'status') {
-        const submitBtn = document.getElementById('submit-btn');
+        const submitBtn = document.getElementById('submit-main');
         const labels = {open:L==='fr'?'Ouvert':'Open', pending:L==='fr'?'En attente':'Pending', solved:L==='fr'?'Résolu':'Solved'};
         if (submitBtn) submitBtn.textContent = (L==='fr'?'Soumettre comme ':'Submit as ') + (labels[action.value]||action.value);
       } else if (action.type === 'priority') {
@@ -965,11 +965,11 @@ function simMacroSelect(name, idx) {
         ? 'Macro appliquée ! Relisez et personnalisez le texte si besoin, puis soumettez comme En attente.'
         : 'Macro applied! Review and personalize the text if needed, then submit as Pending.');
     }
-    ex.target = { action: 'submit-as', value: 'pending', element: 'submit-arr' };
+    ex.target = { action: 'submit', element: 'submit-main' };
     const instrEl = document.getElementById('sim-instruction-text');
     if (instrEl) instrEl.textContent = L==='fr'
-      ? 'Le texte est pré-rempli. Personnalisez-le si besoin, puis cliquez sur ▾ et choisissez "Soumettre comme En attente".'
-      : 'The text is pre-filled. Personalize it if needed, then click ▾ and choose "Submit as Pending".';
+      ? 'Le texte est pré-rempli. Personnalisez-le si besoin, puis cliquez sur "Soumettre comme En attente".'
+      : 'The text is pre-filled. Personalize it if needed, then click "Submit as Pending".';
     setTimeout(() => highlightTarget(ex.target), 400);
   } else {
     _simHandleResult(correct, ex);
