@@ -243,8 +243,8 @@ const MODULES = [
         setup:{ subject:'Comment réinitialiser mon mot de passe ?', requester:'Sophie Bernard', status:'open', type:'question' },
         target:{ action:'apply-macro', element:'macro-btn', macroIndex:0 },
         feedback:{
-          correct:{fr:'Parfait ! La macro a rempli automatiquement la réponse et mis le statut en Pending. Sophie recevra les instructions par email.',en:'Perfect! The macro automatically filled in the reply and set the status to Pending. Sophie will receive the instructions by email.'},
-          wrong:{fr:'Ouvrez la liste avec le bouton ⚡ et sélectionnez \'Réinitialisation mot de passe\'.',en:'Open the list with the ⚡ button and select \'Password reset\'.'}
+          correct:{fr:'Parfait ! Sophie a reçu les instructions par email. Penser à toujours relire la réponse générée avant d\'envoyer.',en:'Perfect! Sophie received the instructions by email. Always remember to re-read the generated reply before sending.'},
+          wrong:{fr:'Ouvrez la liste avec le bouton ⚡ et sélectionnez \'🔑 Réinitialisation mot de passe\'.',en:'Open the list with the ⚡ button and select \'🔑 Password reset\'.'}
         }
       }
     },

@@ -30,7 +30,6 @@ function renderTicketScene(setup, L) {
   const s = Object.assign({
     subject: 'J\'ai une demande',
     requester: 'Guillaume Garcia',
-    requesterEmail: 'guillaumegarcia15@hotm...',
     assignee: 'Assistance/Guillaume Garcia',
     group: 'Support',
     brand: 'OmyCare',
@@ -44,6 +43,11 @@ function renderTicketScene(setup, L) {
     composerMode: 'public',
     macros: []
   }, setup);
+  // Auto-generate email from requester name if not provided
+  if (!s.requesterEmail) {
+    s.requesterEmail = s.requester.toLowerCase().replace(/\s+/g, '.') + '@gmail.com';
+  }
+  window._simSetup = s;
 
   const statusMap = {
     new:'New', open:'Open', pending:'Pending', hold:'On-hold', solved:'Solved', closed:'Closed'
@@ -55,22 +59,22 @@ function renderTicketScene(setup, L) {
   const defaultMacros = [
     { icon:'🔑', name: L==='fr'?'Réinitialisation mot de passe':'Password reset',
       actions:[
-        {type:'reply', text:{fr:'Bonjour,\n\nPour réinitialiser votre mot de passe :\n1. Rendez-vous sur la page de connexion\n2. Cliquez sur "Mot de passe oublié"\n3. Entrez votre adresse email et suivez les instructions\n\nN\'hésitez pas à nous contacter si besoin.\n\nCordialement,\nL\'équipe OmyCare', en:'Hello,\n\nTo reset your password:\n1. Go to the login page\n2. Click "Forgot password"\n3. Enter your email address and follow the instructions\n\nFeel free to contact us if you need further help.\n\nBest regards,\nThe OmyCare team'}},
+        {type:'reply', text:{fr:'Bonjour {{first_name}},\n\nPour réinitialiser votre mot de passe :\n1. Rendez-vous sur la page de connexion\n2. Cliquez sur "Mot de passe oublié"\n3. Entrez votre adresse email et suivez les instructions reçues\n\nN\'hésitez pas à nous contacter si besoin.\n\nCordialement,\nL\'équipe OmyCare', en:'Hello {{first_name}},\n\nTo reset your password:\n1. Go to the login page\n2. Click "Forgot password"\n3. Enter your email address and follow the instructions\n\nFeel free to contact us if you need further help.\n\nBest regards,\nThe OmyCare team'}},
         {type:'status', value:'pending'}
       ]},
     { icon:'⏳', name: L==='fr'?'Client n\'a pas répondu':'Customer hasn\'t responded',
       actions:[
-        {type:'reply', text:{fr:'Bonjour,\n\nNous n\'avons pas eu de vos nouvelles depuis quelques jours. Votre demande est-elle toujours d\'actualité ?\n\nSans retour de votre part sous 48h, nous clôturerons ce ticket.\n\nCordialement,\nL\'équipe OmyCare', en:'Hello,\n\nWe have not heard from you in a few days. Is your request still relevant?\n\nWithout a reply within 48h, we will close this ticket.\n\nBest regards,\nThe OmyCare team'}},
+        {type:'reply', text:{fr:'Bonjour {{first_name}},\n\nNous n\'avons pas eu de vos nouvelles depuis quelques jours. Votre demande est-elle toujours d\'actualité ?\n\nSans retour de votre part sous 48h, nous clôturerons ce ticket.\n\nCordialement,\nL\'équipe OmyCare', en:'Hello {{first_name}},\n\nWe have not heard from you in a few days. Is your request still relevant?\n\nWithout a reply within 48h, we will close this ticket.\n\nBest regards,\nThe OmyCare team'}},
         {type:'status', value:'pending'}
       ]},
     { icon:'✅', name: L==='fr'?'Résolution standard':'Standard resolution',
       actions:[
-        {type:'reply', text:{fr:'Bonjour,\n\nNous espérons que votre problème est à présent résolu. N\'hésitez pas à nous recontacter si vous avez d\'autres questions.\n\nCordialement,\nL\'équipe OmyCare', en:'Hello,\n\nWe hope your issue is now resolved. Please do not hesitate to contact us again if you have any further questions.\n\nBest regards,\nThe OmyCare team'}},
+        {type:'reply', text:{fr:'Bonjour {{first_name}},\n\nNous espérons que votre problème est à présent résolu. N\'hésitez pas à nous recontacter si vous avez d\'autres questions.\n\nCordialement,\nL\'équipe OmyCare', en:'Hello {{first_name}},\n\nWe hope your issue is now resolved. Please do not hesitate to contact us again if you have any further questions.\n\nBest regards,\nThe OmyCare team'}},
         {type:'status', value:'solved'}
       ]},
     { icon:'🔄', name: L==='fr'?'Escalade Niveau 2':'Level 2 escalation',
       actions:[
-        {type:'internal', text:{fr:'Ce ticket nécessite une expertise technique approfondie — escalade vers le support Niveau 2.', en:'This ticket requires deep technical expertise — escalating to Level 2 support.'}},
+        {type:'internal', text:{fr:'[Niveau 2] Ce ticket nécessite une expertise technique approfondie — escalade depuis le support Niveau 1.', en:'[Level 2] This ticket requires deep technical expertise — escalating from Level 1 support.'}},
         {type:'priority', value:'high'}
       ]},
   ];
@@ -911,13 +915,15 @@ function simMacroSelect(name, idx) {
   const macro = (window._simMacros || [])[idx];
   const L = window._simL;
   if (macro && macro.actions) {
+    const firstName = window._simSetup ? window._simSetup.requester.split(' ')[0] : '';
     macro.actions.forEach(action => {
       if (action.type === 'reply' || action.type === 'internal') {
         const ta = document.getElementById('zd-reply-area');
         const modeBtn = document.getElementById('mode-btn');
         const modeIcon = document.getElementById('mode-icon');
         const modeLabel = document.getElementById('mode-label');
-        const text = typeof action.text === 'object' ? (action.text[L] || action.text.fr) : action.text;
+        let text = typeof action.text === 'object' ? (action.text[L] || action.text.fr) : action.text;
+        text = text.replace(/\{\{first_name\}\}/g, firstName);
         if (ta) { ta.value = text; }
         if (action.type === 'internal') {
           if (modeBtn) modeBtn.classList.add('internal-mode');
@@ -953,7 +959,25 @@ function simMacroSelect(name, idx) {
 
   const target = ex.target;
   const correct = target.action === 'apply-macro' && (target.macroIndex === idx || target.macroIndex === undefined);
-  _simHandleResult(correct, ex);
+
+  if (target.action === 'apply-macro' && correct) {
+    // Phase 2: macro applied correctly — now ask to submit
+    const fb = document.getElementById('sim-feedback');
+    if (fb) {
+      fb.className = 'sim-feedback-banner show ok';
+      fb.innerHTML = '✅ ' + (L==='fr'
+        ? 'Macro appliquée ! Relisez et personnalisez le texte si besoin, puis soumettez comme En attente.'
+        : 'Macro applied! Review and personalize the text if needed, then submit as Pending.');
+    }
+    ex.target = { action: 'submit-as', value: 'pending', element: 'submit-arr' };
+    const instrEl = document.getElementById('sim-instruction-text');
+    if (instrEl) instrEl.textContent = L==='fr'
+      ? 'Le texte est pré-rempli. Personnalisez-le si besoin, puis cliquez sur ▾ et choisissez "Soumettre comme En attente".'
+      : 'The text is pre-filled. Personalize it if needed, then click ▾ and choose "Submit as Pending".';
+    setTimeout(() => highlightTarget(ex.target), 400);
+  } else {
+    _simHandleResult(correct, ex);
+  }
 }
 
 function filterMacros(val) {
