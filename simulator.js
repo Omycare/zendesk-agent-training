@@ -794,6 +794,191 @@ function simPiSolve() {
 
 // ── END PROBLEM-INCIDENT SCENE ──────────────────────────────────────────────
 
+// ── CREATE MACRO SCENE ──────────────────────────────────────────────────────
+
+function getAdminSidebar(fr) {
+  return `<div style="width:220px;background:#F3F4F6;border-right:1px solid #D8DCDE;overflow-y:auto;flex-shrink:0;font-size:12px">
+    <div style="padding:12px 16px;font-weight:700;font-size:13px;color:#2F3941;border-bottom:1px solid #D8DCDE">${fr?'Espaces de travail':'Workspaces'}</div>
+    <div style="padding:8px 16px 2px;font-size:10px;font-weight:700;color:#68737D;text-transform:uppercase;letter-spacing:.5px">${fr?'Outils de l\'agent':'Agent tools'}</div>
+    <div style="padding:6px 16px;color:#49545C;cursor:pointer" onmouseover="this.style.background='#E5E7EB'" onmouseout="this.style.background=''">${fr?'Espace de travail d\'agent':'Agent workspace'}</div>
+    <div style="padding:6px 16px;color:#49545C;cursor:pointer" onmouseover="this.style.background='#E5E7EB'" onmouseout="this.style.background=''">${fr?'Vues':'Views'}</div>
+    <div style="padding:6px 16px;background:#D1E9FF;color:#1F73B7;font-weight:600;border-left:3px solid #1F73B7">Macros</div>
+    <div style="padding:6px 16px;color:#49545C;cursor:pointer" onmouseover="this.style.background='#E5E7EB'" onmouseout="this.style.background=''">Raccourcis</div>
+    <div style="padding:6px 16px;color:#49545C;cursor:pointer" onmouseover="this.style.background='#E5E7EB'" onmouseout="this.style.background=''">${fr?'Contenu dynamique':'Dynamic content'}</div>
+    <div style="padding:6px 16px;color:#49545C;cursor:pointer" onmouseover="this.style.background='#E5E7EB'" onmouseout="this.style.background=''">Fiches</div>
+    <div style="padding:6px 16px;color:#49545C;cursor:pointer" onmouseover="this.style.background='#E5E7EB'" onmouseout="this.style.background=''">Dispositions</div>
+  </div>`;
+}
+
+function getCmPhaseHtml(phase, fr) {
+  if (phase === 1) {
+    return `<div style="display:flex;height:380px;overflow:hidden;font-size:13px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">
+      <div style="width:48px;background:#1F3A5F;display:flex;flex-direction:column;align-items:center;padding:8px 0;gap:8px;flex-shrink:0">
+        <div style="width:32px;height:32px;background:#1F73B7;border-radius:6px;display:flex;align-items:center;justify-content:center;color:white;font-weight:900;font-size:16px">Z</div>
+        <div style="width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.6);font-size:15px">🏠</div>
+        <div style="width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.6);font-size:15px">🎧</div>
+        <div style="width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.6);font-size:15px">👥</div>
+        <div style="width:32px;height:32px;border-radius:6px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;color:white;font-size:15px">🛡️</div>
+      </div>
+      <div style="width:210px;background:#1F3A5F;color:white;font-size:13px;flex-shrink:0;overflow-y:auto">
+        <div style="padding:12px 16px;font-weight:600;font-size:14px;border-bottom:1px solid rgba(255,255,255,.1)">${fr?'Assistance ▲':'Support ▲'}</div>
+        ${['🎧 Assistance','📚 Connaissances','👥 Communauté','💬 Chat','📊 Analyses','📈 Ventes'].map(item=>`<div style="padding:9px 16px;color:rgba(255,255,255,.75);cursor:pointer" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background=''">${item}</div>`).join('')}
+        <div id="nav-admin-center" style="padding:9px 16px;color:white;cursor:pointer;display:flex;align-items:center;gap:8px;border-radius:4px;margin:2px 8px;background:rgba(255,255,255,.06)" onclick="simCmAdvance()" onmouseover="this.style.background='rgba(255,255,255,.18)'" onmouseout="this.style.background='rgba(255,255,255,.06)'">🛡️ ${fr?'Centre d\'administration':'Admin Center'}</div>
+      </div>
+      <div style="flex:1;background:#F3F4F6;overflow:hidden">
+        <div style="background:white;border-bottom:1px solid #D8DCDE;padding:8px 16px;display:flex;gap:10px">
+          <span style="background:#E8E8E8;padding:3px 10px;border-radius:12px;font-size:11px">👤 Kim GIRAUD-BONNE ×</span>
+          <span style="background:#E8E8E8;padding:3px 10px;border-radius:12px;font-size:11px">🎧 EXEMPLE : Fonctionn... #1 ×</span>
+        </div>
+        <div style="padding:20px;color:#49545C">
+          <div style="font-size:15px;font-weight:600;margin-bottom:12px">1 ticket</div>
+          <div style="background:white;border:1px solid #D8DCDE;border-radius:6px;padding:12px 16px;display:flex;align-items:center;gap:12px">
+            <div style="width:36px;height:36px;background:#C8D0D6;border-radius:50%;flex-shrink:0"></div>
+            <div><div style="font-weight:600;font-size:12px">Client | EXEMPLE : Fonctionnement de Zendesk <span style="background:#CC3340;color:white;font-size:10px;padding:1px 5px;border-radius:3px;margin-left:4px">-173 j</span></div><div style="font-size:11px;color:#68737D;margin-top:2px">${fr?'Ouvert · Ticket enfant créé · lundi 04:04':'Open · Child ticket created · Mon 04:04'}</div></div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  if (phase === 2) {
+    return `<div style="display:flex;height:380px;overflow:hidden;font-size:13px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">
+      ${getAdminSidebar(fr)}
+      <div style="flex:1;overflow-y:auto;padding:20px 28px;background:white">
+        <div style="font-size:11px;color:#68737D;margin-bottom:6px">${fr?'Espaces de travail':'Workspaces'} › ${fr?'Outils de l\'agent':'Agent tools'} › <span style="color:#1F73B7">Macros</span></div>
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px">
+          <div>
+            <h2 style="font-size:20px;font-weight:700;margin:0 0 4px">Macros</h2>
+            <p style="font-size:11px;color:#68737D;margin:0">${fr?'Une macro est une réponse ou une action préparée que les agents utilisent pour répondre aux demandes courantes.':'A macro is a prepared response or action that agents use to answer common requests.'}</p>
+          </div>
+          <div style="display:flex;gap:8px;flex-shrink:0;margin-top:4px">
+            <button style="border:1px solid #D8DCDE;background:white;border-radius:4px;padding:6px 12px;font-size:12px;cursor:pointer">${fr?'Actions ▾':'Actions ▾'}</button>
+            <button id="create-macro-btn" style="background:#1F73B7;color:white;border:none;border-radius:4px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer" onclick="simCmAdvance()" onmouseover="this.style.background='#1060A3'" onmouseout="this.style.background='#1F73B7'">${fr?'Créer une macro':'Create macro'}</button>
+          </div>
+        </div>
+        <div style="border:1px solid #D8DCDE;border-radius:4px;padding:5px 10px;display:flex;align-items:center;gap:6px;color:#68737D;font-size:12px;max-width:360px;margin-bottom:8px">🔍 <span style="color:#C8D0D6">${fr?'Rechercher...':'Search...'}</span></div>
+        <div style="font-size:11px;color:#68737D;margin-bottom:8px">4 ${fr?'macros actives':'active macros'}</div>
+        <table style="width:100%;border-collapse:collapse;font-size:12px">
+          <thead><tr style="border-bottom:2px solid #D8DCDE;text-align:left">
+            <th style="padding:5px 8px;color:#68737D;font-weight:600">${fr?'Nom ↑':'Name ↑'}</th>
+            <th style="padding:5px 8px;color:#68737D;font-weight:600">${fr?'Date de création':'Created'}</th>
+            <th style="padding:5px 8px;color:#68737D;font-weight:600">${fr?'Disponible pour':'Available to'}</th>
+          </tr></thead>
+          <tbody>${[fr?'Baisser la priorité et informer le client':'Lower priority and inform customer',fr?'Client n\'ayant pas répondu':'Customer hasn\'t responded',fr?'Fermer et retourner aux sujets':'Close and return to subjects',fr?'Me l\'affecter':'Assign to me'].map(n=>`<tr style="border-bottom:1px solid #F3F4F6"><td style="padding:9px 8px;color:#1F73B7;cursor:pointer">${n}</td><td style="padding:9px 8px;color:#49545C">26 ${fr?'mars':'Mar'} 2026</td><td style="padding:9px 8px;color:#49545C">${fr?'Tous les agents':'All agents'}</td></tr>`).join('')}</tbody>
+        </table>
+      </div>
+    </div>`;
+  }
+
+  // Phase 3: Create macro form
+  return `<div style="display:flex;height:380px;overflow:hidden;font-size:13px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">
+    ${getAdminSidebar(fr)}
+    <div style="flex:1;overflow-y:auto;padding:20px 28px;background:white">
+      <div style="font-size:11px;color:#68737D;margin-bottom:6px">${fr?'Espaces de travail':'Workspaces'} › <span style="color:#1F73B7">Macros</span> › ${fr?'Ajouter une nouvelle macro':'Add a new macro'}</div>
+      <h2 style="font-size:20px;font-weight:700;margin:0 0 18px">${fr?'Ajouter une nouvelle macro':'Add a new macro'}</h2>
+      <div style="margin-bottom:14px">
+        <label style="display:block;font-size:12px;font-weight:600;color:#2F3941;margin-bottom:4px">${fr?'Nom de la macro':'Macro name'}<span style="color:#CC3340">*</span></label>
+        <input id="cm-name" type="text" placeholder="${fr?'Ex: Relances :: Première relance':'Ex: Follow-ups :: First reminder'}" style="width:100%;border:1px solid #D8DCDE;border-radius:4px;padding:7px 10px;font-size:12px;box-sizing:border-box;outline:none" oninput="simCmCheckForm()" onfocus="this.style.borderColor='#1F73B7'" onblur="this.style.borderColor='#D8DCDE'">
+      </div>
+      <div style="margin-bottom:14px">
+        <label style="display:block;font-size:12px;font-weight:600;color:#2F3941;margin-bottom:4px">Description</label>
+        <textarea style="width:100%;border:1px solid #D8DCDE;border-radius:4px;padding:7px 10px;font-size:12px;min-height:50px;resize:vertical;box-sizing:border-box;outline:none" placeholder="${fr?'Saisissez une description facultative':'Enter an optional description'}" onfocus="this.style.borderColor='#1F73B7'" onblur="this.style.borderColor='#D8DCDE'"></textarea>
+      </div>
+      <div style="margin-bottom:18px">
+        <label style="display:block;font-size:12px;font-weight:600;color:#2F3941;margin-bottom:4px">${fr?'Disponible pour':'Available to'}</label>
+        <select id="cm-availability" style="border:1px solid #D8DCDE;border-radius:4px;padding:6px 10px;font-size:12px;min-width:200px" onchange="simCmCheckForm()">
+          <option value="all">${fr?'Tous les agents':'All agents'}</option>
+          <option value="me">${fr?'Moi uniquement':'Only me'}</option>
+        </select>
+      </div>
+      <div style="border-top:1px solid #D8DCDE;padding-top:14px">
+        <h3 style="font-size:15px;font-weight:600;margin:0 0 3px">Actions</h3>
+        <p style="font-size:11px;color:#68737D;margin:0 0 10px">${fr?'Ajoutez des actions pour insérer un commentaire ou mettre à jour des champs du ticket.':'Add actions to insert a comment or update ticket fields.'}</p>
+        <div id="cm-actions-list"></div>
+        <button id="add-action-btn" style="border:1px solid #1F73B7;color:#1F73B7;background:white;border-radius:4px;padding:6px 14px;font-size:12px;cursor:pointer" onclick="simCmAddAction()" onmouseover="this.style.background='#EBF5FB'" onmouseout="this.style.background='white'">${fr?'Ajouter une action':'Add action'}</button>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:16px">
+        <button id="save-macro-btn" style="background:#C8D0D6;color:white;border:none;border-radius:4px;padding:7px 18px;font-size:12px;font-weight:600;cursor:not-allowed;transition:background .2s" disabled onclick="simCmSave()">${fr?'Créer':'Create'}</button>
+        <button style="border:1px solid #D8DCDE;background:white;border-radius:4px;padding:7px 14px;font-size:12px;cursor:pointer;color:#49545C">${fr?'Annuler':'Cancel'}</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderCreateMacroScene(setup, L) {
+  window._cmPhase = 1;
+  return getCmPhaseHtml(1, L === 'fr');
+}
+
+function simCmAdvance() {
+  const fr = window._simL === 'fr';
+  window._cmPhase = (window._cmPhase || 1) + 1;
+  const sim = document.getElementById('zd-sim-area');
+  if (sim) sim.innerHTML = getCmPhaseHtml(window._cmPhase, fr);
+  const instructions = {
+    fr: { 2:'Vous êtes dans le Centre d\'administration. Cliquez sur "Créer une macro" pour commencer.', 3:'Saisissez un nom (ex: "Relances :: Première relance"), choisissez "Moi uniquement", cliquez "Ajouter une action", rédigez votre texte type, puis cliquez "Créer".' },
+    en: { 2:'You\'re in Admin Center. Click "Create macro" to start.', 3:'Enter a name (e.g. "Follow-ups :: First reminder"), choose "Only me", click "Add action", write your template text, then click "Create".' }
+  };
+  const L = fr ? 'fr' : 'en';
+  const instrEl = document.getElementById('sim-instruction-text');
+  if (instrEl && instructions[L][window._cmPhase]) instrEl.textContent = instructions[L][window._cmPhase];
+  const targets = { 2:'create-macro-btn', 3:'save-macro-btn' };
+  if (targets[window._cmPhase]) setTimeout(() => highlightTarget({element: targets[window._cmPhase]}), 150);
+}
+
+function simCmAddAction() {
+  const list = document.getElementById('cm-actions-list');
+  if (!list || list.children.length > 0) return;
+  const fr = window._simL === 'fr';
+  const addBtn = document.getElementById('add-action-btn');
+  if (addBtn) addBtn.style.display = 'none';
+  list.innerHTML = `<div style="border:1px solid #D8DCDE;border-radius:6px;padding:10px 12px;margin-bottom:10px">
+    <div style="display:flex;gap:8px;align-items:flex-start">
+      <select style="border:1px solid #D8DCDE;border-radius:4px;padding:5px 8px;font-size:12px;flex-shrink:0">
+        <option>${fr?'Commentaire du ticket':'Ticket comment'}</option>
+        <option>${fr?'Statut':'Status'}</option>
+        <option>${fr?'Priorité':'Priority'}</option>
+        <option>${fr?'Assigné à':'Assignee'}</option>
+      </select>
+      <div style="flex:1">
+        <div style="display:flex;gap:4px;margin-bottom:6px">
+          <button style="font-size:11px;border:1px solid #1F73B7;background:#EBF5FB;color:#1F73B7;border-radius:3px;padding:2px 8px;cursor:pointer">${fr?'Public':'Public'}</button>
+          <button style="font-size:11px;border:1px solid #D8DCDE;background:white;color:#49545C;border-radius:3px;padding:2px 8px;cursor:pointer">${fr?'Interne':'Internal'}</button>
+        </div>
+        <textarea id="cm-action-text" placeholder="${fr?'Bonjour {{ticket.requester.first_name}},\\n\\nNous n\\'avons pas eu de vos nouvelles...':'Hello {{ticket.requester.first_name}},\\n\\nWe haven\\'t heard from you...'}" style="width:100%;border:1px solid #D8DCDE;border-radius:4px;padding:6px 8px;font-size:12px;min-height:65px;resize:vertical;box-sizing:border-box;outline:none" oninput="simCmCheckForm()" onfocus="this.style.borderColor='#1F73B7'" onblur="this.style.borderColor='#D8DCDE'"></textarea>
+      </div>
+      <button onclick="this.closest('div').parentElement.remove();document.getElementById('add-action-btn').style.display='';simCmCheckForm()" style="color:#CC3340;border:none;background:none;cursor:pointer;font-size:18px;flex-shrink:0;line-height:1">×</button>
+    </div>
+  </div>`;
+  simCmCheckForm();
+}
+
+function simCmCheckForm() {
+  const name = document.getElementById('cm-name');
+  const actionText = document.getElementById('cm-action-text');
+  const saveBtn = document.getElementById('save-macro-btn');
+  if (!saveBtn) return;
+  const hasName = name && name.value.trim().length > 2;
+  const hasAction = !!actionText;
+  if (hasName && hasAction) {
+    saveBtn.disabled = false;
+    saveBtn.style.background = '#1F73B7';
+    saveBtn.style.cursor = 'pointer';
+  } else {
+    saveBtn.disabled = true;
+    saveBtn.style.background = '#C8D0D6';
+    saveBtn.style.cursor = 'not-allowed';
+  }
+}
+
+function simCmSave() {
+  const ex = window._simExercise;
+  if (!ex || window._simAnswered) return;
+  _simHandleResult(true, ex);
+}
+
+// ── END CREATE MACRO SCENE ──────────────────────────────────────────────────
+
 function renderSimExercise(exercise, container, L) {
   window._simExercise = exercise;
   window._simL = L;
@@ -805,6 +990,7 @@ function renderSimExercise(exercise, container, L) {
   else if (exercise.scene === 'home') sceneHtml = renderAgentHomeScene(exercise.setup || {}, L);
   else if (exercise.scene === 'new-ticket') sceneHtml = renderNewTicketScene(exercise.setup || {}, L);
   else if (exercise.scene === 'problem-incident') sceneHtml = renderProblemIncidentScene(exercise.setup || {}, L);
+  else if (exercise.scene === 'create-macro') sceneHtml = renderCreateMacroScene(exercise.setup || {}, L);
 
   container.innerHTML = `
     <div class="sim-wrap" style="margin-top:22px">
