@@ -95,7 +95,7 @@ function renderTicketScene(setup, L) {
   <div style="display:flex;align-items:center;gap:6px;padding:6px 14px;background:white;border-bottom:1px solid #D8DCDE;font-size:12px;color:#49545C">
     <span style="color:#1F73B7;cursor:pointer">${L==='fr'?'Retour':'Back'}</span>
     <span>›</span>
-    <span class="zd-status-pill sp-${s.status}">${statusMap[s.status]||'Open'}</span>
+    <span class="zd-status-pill sp-${s.status}" id="ticket-status-pill">${statusMap[s.status]||'Open'}</span>
     <span>${L==='fr'?'Ticket':'Ticket'} #${s.ticketId||'13'}</span>
   </div>
   <div class="zd-ticket-layout">
@@ -324,7 +324,7 @@ function renderTicketScene(setup, L) {
         <div class="zd-ih-ticket">
           <div class="ih-subject">${s.subject}</div>
           <div class="ih-meta">Oct 01 10:37</div>
-          <div class="ih-meta">${L==='fr'?'Statut':'Status'} <span class="zd-status-pill sp-${s.status}" style="font-size:10px">${statusMap[s.status]||'Pending'}</span></div>
+          <div class="ih-meta">${L==='fr'?'Statut':'Status'} <span class="zd-status-pill sp-${s.status}" id="ih-status-pill" style="font-size:10px">${statusMap[s.status]||'Pending'}</span></div>
         </div>
       </div>
     </div>
@@ -936,6 +936,7 @@ function simMacroSelect(name, idx) {
         const submitBtn = document.getElementById('submit-main');
         const labels = {open:L==='fr'?'Ouvert':'Open', pending:L==='fr'?'En attente':'Pending', solved:L==='fr'?'Résolu':'Solved'};
         if (submitBtn) submitBtn.textContent = (L==='fr'?'Soumettre comme ':'Submit as ') + (labels[action.value]||action.value);
+        window._simPendingStatus = action.value;
       } else if (action.type === 'priority') {
         const sel = document.getElementById('field-priority');
         if (sel) sel.value = action.value;
@@ -1027,6 +1028,21 @@ function _simHandleResult(correct, ex) {
 
   // Remove highlights
   document.querySelectorAll('.zd-highlight').forEach(el => el.classList.remove('zd-highlight'));
+
+  // Update status pills if a status was submitted
+  if (correct && window._simPendingStatus) {
+    const newStatus = window._simPendingStatus;
+    const statusMap = {open:'Open', pending:'Pending', solved:'Solved', hold:'On-hold'};
+    const label = statusMap[newStatus] || newStatus;
+    ['ticket-status-pill', 'ih-status-pill'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.className = `zd-status-pill sp-${newStatus}`;
+        el.textContent = label;
+      }
+    });
+    window._simPendingStatus = null;
+  }
 
   // Celebrate target element + floating emoji reaction on correct answer
   if (correct && ex.target && ex.target.element) {
