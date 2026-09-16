@@ -43,6 +43,19 @@
 .sim-feedback-banner.show { display:flex; }
 .sim-feedback-banner.ok  { background:#D1FAE5; color:#065F46; }
 .sim-feedback-banner.ko  { background:#FEE2E2; color:#991B1B; }
+.sim-retry-btn {
+  margin-left: auto;
+  background: white;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  padding: 3px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  color: inherit;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.sim-retry-btn:hover { opacity: .75; }
 
 /* ── Highlight pulse (on target elements) ── */
 .zd-highlight {

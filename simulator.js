@@ -988,6 +988,13 @@ function toggleDotMenu() {
   if (dd) dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
 }
 
+function simRetry() {
+  const ex = window._simExercise;
+  const L = window._simL;
+  const container = document.getElementById('sim-exercise-container');
+  if (container && ex) renderSimExercise(ex, container, L);
+}
+
 function _simHandleResult(correct, ex) {
   if (window._simAnswered) return;
   window._simAnswered = true;
@@ -995,7 +1002,8 @@ function _simHandleResult(correct, ex) {
   const L = window._simL;
   const fb = document.getElementById('sim-feedback');
   fb.className = 'sim-feedback-banner show ' + (correct ? 'ok' : 'ko');
-  fb.innerHTML = (correct ? '✅ ' : '❌ ') + (correct ? ex.feedback.correct[L] : ex.feedback.wrong[L]);
+  const retryBtn = correct ? '' : `<button class="sim-retry-btn" onclick="simRetry()">↺ ${L==='fr'?'Réessayer':'Retry'}</button>`;
+  fb.innerHTML = (correct ? '✅ ' : '❌ ') + (correct ? ex.feedback.correct[L] : ex.feedback.wrong[L]) + retryBtn;
 
   // Remove highlights
   document.querySelectorAll('.zd-highlight').forEach(el => el.classList.remove('zd-highlight'));

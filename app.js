@@ -190,13 +190,25 @@ function validate() {
 
   const fb = document.getElementById('feedback');
   fb.className = 'feedback show ' + (selectedCorrect ? 'ok' : 'ko');
-  fb.innerHTML = (selectedCorrect ? '✅ ' : '❌ ') + selectedFeedback;
+  const retryBtn = selectedCorrect ? '' : `<button class="sim-retry-btn" style="margin-left:12px" onclick="retryQuiz()">↺ ${state.lang==='fr'?'Réessayer':'Retry'}</button>`;
+  fb.innerHTML = (selectedCorrect ? '✅ ' : '❌ ') + selectedFeedback + retryBtn;
 
   if (selectedCorrect) {
     state.done[MODULES[state.mod].lessons[state.les].key] = true;
     updateProgress();
     renderSidebar();
   }
+}
+
+function retryQuiz() {
+  state.answered = false;
+  selectedOpt = null;
+  selectedCorrect = null;
+  document.querySelectorAll('.opt').forEach(o => o.classList.remove('selected', 'correct', 'wrong'));
+  const fb = document.getElementById('feedback');
+  if (fb) { fb.className = 'feedback'; fb.innerHTML = ''; }
+  const btn = document.getElementById('val-btn');
+  if (btn) btn.disabled = true;
 }
 
 // ─── NAVIGATION ──────────────────────────────────────────────────────────────
