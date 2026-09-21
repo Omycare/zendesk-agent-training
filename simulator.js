@@ -945,7 +945,7 @@ function simCmAddAction() {
           <button style="font-size:11px;border:1px solid #1F73B7;background:#EBF5FB;color:#1F73B7;border-radius:3px;padding:2px 8px;cursor:pointer">${fr?'Public':'Public'}</button>
           <button style="font-size:11px;border:1px solid #D8DCDE;background:white;color:#49545C;border-radius:3px;padding:2px 8px;cursor:pointer">${fr?'Interne':'Internal'}</button>
         </div>
-        <textarea id="cm-action-text" placeholder="${fr?'Bonjour {{ticket.requester.first_name}},\\n\\nNous n\\'avons pas eu de vos nouvelles...':'Hello {{ticket.requester.first_name}},\\n\\nWe haven\\'t heard from you...'}" style="width:100%;border:1px solid #D8DCDE;border-radius:4px;padding:6px 8px;font-size:12px;min-height:65px;resize:vertical;box-sizing:border-box;outline:none" oninput="simCmCheckForm()" onfocus="this.style.borderColor='#1F73B7'" onblur="this.style.borderColor='#D8DCDE'"></textarea>
+        <textarea id="cm-action-text" placeholder="${fr?'Bonjour {{ticket.requester.first_name}}, Nous n\'avons pas eu de vos nouvelles...':'Hello {{ticket.requester.first_name}}, We haven\'t heard from you...'}" style="width:100%;border:1px solid #D8DCDE;border-radius:4px;padding:6px 8px;font-size:12px;min-height:65px;resize:vertical;box-sizing:border-box;outline:none" oninput="simCmCheckForm()" onfocus="this.style.borderColor='#1F73B7'" onblur="this.style.borderColor='#D8DCDE'"></textarea>
       </div>
       <button onclick="this.closest('div').parentElement.remove();document.getElementById('add-action-btn').style.display='';simCmCheckForm()" style="color:#CC3340;border:none;background:none;cursor:pointer;font-size:18px;flex-shrink:0;line-height:1">×</button>
     </div>
