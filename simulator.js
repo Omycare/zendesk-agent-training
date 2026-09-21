@@ -1172,10 +1172,19 @@ function filterMacros(val) {
 
 function toggleMacroDropdown() {
   const dd = document.getElementById('macro-dropdown');
+  const btn = document.getElementById('macro-btn');
   if (!dd) return;
   const willOpen = !dd.classList.contains('open');
   dd.classList.toggle('open');
   if (willOpen) {
+    if (btn) {
+      const r = btn.getBoundingClientRect();
+      const ddH = Math.min(280, window.innerHeight * 0.4);
+      dd.style.left = r.left + 'px';
+      dd.style.width = r.width + 'px';
+      dd.style.bottom = (window.innerHeight - r.top + 4) + 'px';
+      dd.style.maxHeight = ddH + 'px';
+    }
     const inp = document.getElementById('macro-search-input');
     if (inp) { inp.value = ''; filterMacros(''); setTimeout(()=>inp.focus(), 50); }
   }

@@ -252,10 +252,9 @@
 
 /* Macro dropdown */
 .zd-macro-dropdown {
-  display:none; position:absolute; bottom:100%; left:0; right:0;
+  display:none; position:fixed;
   background:white; border:1px solid #D8DCDE; border-radius:6px;
-  box-shadow:0 4px 16px rgba(0,0,0,.12); z-index:100; overflow:hidden;
-  margin-bottom:4px;
+  box-shadow:0 4px 16px rgba(0,0,0,.12); z-index:9999; overflow:hidden;
 }
 .zd-macro-dropdown.open { display:block; }
 .zd-macro-search {
