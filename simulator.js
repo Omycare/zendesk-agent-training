@@ -916,8 +916,8 @@ function simCmAdvance() {
   const sim = document.getElementById('zd-sim-area');
   if (sim) sim.innerHTML = getCmPhaseHtml(window._cmPhase, fr);
   const instructions = {
-    fr: { 2:'Vous êtes dans le Centre d\'administration. Cliquez sur "Créer une macro" pour commencer.', 3:'Saisissez un nom (ex: "Relances :: Première relance"), choisissez "Moi uniquement", cliquez "Ajouter une action", rédigez votre texte type, puis cliquez "Créer".' },
-    en: { 2:'You\'re in Admin Center. Click "Create macro" to start.', 3:'Enter a name (e.g. "Follow-ups :: First reminder"), choose "Only me", click "Add action", write your template text, then click "Create".' }
+    fr: { 2:'Vous êtes dans le Centre d\'administration. Cliquez sur "Créer une macro" pour commencer.', 3:'Saisissez un nom (ex: "Relances :: Première relance"), choisissez "Moi uniquement", cliquez "Ajouter une action", rédigez votre texte. Ajoutez ensuite une action "Mode de commentaire" (Public/Privé) et une action "Statut", puis cliquez "Créer".' },
+    en: { 2:'You\'re in Admin Center. Click "Create macro" to start.', 3:'Enter a name (e.g. "Follow-ups :: First reminder"), choose "Only me", click "Add action", write your template text. Then add a "Comment mode" action (Public/Private) and a "Status" action, then click "Create".' }
   };
   const L = fr ? 'fr' : 'en';
   const instrEl = document.getElementById('sim-instruction-text');
@@ -928,13 +928,14 @@ function simCmAdvance() {
 
 function simCmAddAction() {
   const list = document.getElementById('cm-actions-list');
-  if (!list || list.children.length >= 2) return;
+  if (!list || list.children.length >= 3) return;
   const fr = window._simL === 'fr';
   const addBtn = document.getElementById('add-action-btn');
   list.insertAdjacentHTML('beforeend', `<div class="cm-action-row" style="border:1px solid #D8DCDE;border-radius:6px;padding:10px 12px;margin-bottom:10px">
     <div style="display:flex;gap:8px;align-items:flex-start">
       <select onchange="simCmActionTypeChange(this)" style="border:1px solid #D8DCDE;border-radius:4px;padding:5px 8px;font-size:12px;flex-shrink:0">
         <option value="comment">${fr?'Commentaire du ticket':'Ticket comment'}</option>
+        <option value="comment-mode">${fr?'Mode de commentaire':'Comment mode'}</option>
         <option value="status">${fr?'Statut':'Status'}</option>
         <option value="priority">${fr?'Priorité':'Priority'}</option>
         <option value="assignee">${fr?'Assigné à':'Assignee'}</option>
@@ -949,7 +950,7 @@ function simCmAddAction() {
       <button onclick="this.closest('.cm-action-row').remove();document.getElementById('add-action-btn').style.display='';simCmCheckForm()" style="color:#CC3340;border:none;background:none;cursor:pointer;font-size:18px;flex-shrink:0;line-height:1">×</button>
     </div>
   </div>`);
-  if (list.children.length >= 2 && addBtn) addBtn.style.display = 'none';
+  if (list.children.length >= 3 && addBtn) addBtn.style.display = 'none';
   simCmCheckForm();
 }
 
@@ -977,6 +978,11 @@ function simCmActionTypeChange(select) {
       <button class="cm-mode-btn" onclick="simCmToggleMode(this)" style="font-size:11px;border:1px solid #D8DCDE;background:white;color:#49545C;border-radius:3px;padding:2px 8px;cursor:pointer">${fr?'Interne':'Internal'}</button>
     </div>
     <textarea class="cm-action-text" placeholder="${fr?'Bonjour {{ticket.requester.first_name}}...':'Hello {{ticket.requester.first_name}}...'}" style="width:100%;border:1px solid #D8DCDE;border-radius:4px;padding:6px 8px;font-size:12px;min-height:65px;resize:vertical;box-sizing:border-box;outline:none" oninput="simCmCheckForm()" onfocus="this.style.borderColor='#1F73B7'" onblur="this.style.borderColor='#D8DCDE'"></textarea>`;
+  } else if (val === 'comment-mode') {
+    content.innerHTML = `<select style="border:1px solid #D8DCDE;border-radius:4px;padding:5px 8px;font-size:12px;min-width:160px">
+      <option>${fr?'Public':'Public'}</option>
+      <option>${fr?'Privé':'Private'}</option>
+    </select>`;
   } else {
     const opts = {
       status:   fr ? ['Ouvert','En attente','En attente interne','Résolu']  : ['Open','Pending','On-hold','Solved'],
