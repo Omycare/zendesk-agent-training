@@ -1014,9 +1014,8 @@ function simCmSave() {
 
 // ── USER PROFILE SCENE (add contact) ────────────────────────────────────────
 function renderUserProfileScene(setup, L) {
-  const fr = L === 'fr';
   window._upSetup = setup;
-  return buildUserProfileHtml(fr, 'initial');
+  return buildUserProfileHtml(L === 'fr', 'ticket');
 }
 
 function buildUserProfileHtml(fr, state) {
@@ -1024,80 +1023,98 @@ function buildUserProfileHtml(fr, state) {
   const userName = s.requester || 'Alex Martin';
   const orgName  = s.org || 'NovaTech';
   const email    = s.email || 'alex.martin@novatech.com';
+  const subject  = s.subject || (fr ? 'Problème de connexion' : 'Login issue');
 
-  const tabs = `<div style="display:flex;border-bottom:1px solid #D8DCDE;background:white;font-size:12px;flex-shrink:0">
-    <div style="padding:9px 16px;border-bottom:2px solid #1F73B7;color:#1F73B7;font-weight:600;cursor:default">${userName}</div>
-    <div style="padding:9px 16px;color:#49545C;cursor:pointer">${orgName}</div>
-    <div style="padding:9px 16px;color:#49545C;display:flex;gap:5px;align-items:center"><span style="background:#CC3340;color:white;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700">Open</span>Ticket #2048</div>
-  </div>`;
+  // ── Tab bar (shared across all states) ──
+  const tabUser   = state === 'ticket'
+    ? `<div onclick="simUpGoToUser()" style="padding:9px 16px;color:#49545C;cursor:pointer;font-size:12px" onmouseover="this.style.color='#1F73B7'" onmouseout="this.style.color='#49545C'">${userName}</div>`
+    : `<div style="padding:9px 16px;border-bottom:2px solid #1F73B7;color:#1F73B7;font-weight:600;font-size:12px;cursor:default">${userName}</div>`;
+  const tabOrg    = `<div style="padding:9px 16px;color:#49545C;font-size:12px;cursor:pointer">${orgName}</div>`;
+  const tabTicket = `<div style="padding:9px 16px;color:${state==='ticket'?'#1F73B7':'#49545C'};font-weight:${state==='ticket'?'600':'400'};font-size:12px;display:flex;gap:5px;align-items:center;${state==='ticket'?'border-bottom:2px solid #1F73B7':''}"><span style="background:#CC3340;color:white;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700">Open</span>Ticket #2048</div>`;
+  const tabs = `<div style="display:flex;border-bottom:1px solid #D8DCDE;background:white;flex-shrink:0">${tabUser}${tabOrg}${tabTicket}</div>`;
 
-  const dropdown = `<div id="up-dropdown" style="background:white;border:1px solid #D8DCDE;border-radius:4px;box-shadow:0 3px 10px rgba(0,0,0,.12);margin-bottom:6px">
+  // ── TICKET state ──
+  if (state === 'ticket') {
+    const leftTicket = `<div style="width:200px;flex-shrink:0;padding:14px;border-right:1px solid #D8DCDE;font-size:12px;overflow-y:auto">
+      <div style="margin-bottom:12px"><div style="font-size:10px;font-weight:600;color:#49545C;text-transform:uppercase;margin-bottom:4px">Brand</div><div style="border:1px solid #D8DCDE;border-radius:4px;padding:5px 9px;color:#2F3941">NovaTech</div></div>
+      <div style="margin-bottom:12px"><div style="font-size:10px;font-weight:600;color:#49545C;text-transform:uppercase;margin-bottom:4px">Requester</div><div style="border:1px solid #D8DCDE;border-radius:4px;padding:5px 9px;color:#2F3941">${userName}</div></div>
+      <div style="margin-bottom:12px"><div style="font-size:10px;font-weight:600;color:#49545C;text-transform:uppercase;margin-bottom:4px">Assignee</div><div style="border:1px solid #D8DCDE;border-radius:4px;padding:5px 9px;color:#68737D">—</div></div>
+      <div style="margin-bottom:12px"><div style="font-size:10px;font-weight:600;color:#49545C;text-transform:uppercase;margin-bottom:4px">Followers</div><div style="border:1px solid #D8DCDE;border-radius:4px;padding:5px 9px;color:#68737D">—</div></div>
+      <div><div style="font-size:10px;font-weight:600;color:#49545C;text-transform:uppercase;margin-bottom:4px">Tags</div><div style="border:1px solid #D8DCDE;border-radius:4px;padding:5px 9px;color:#68737D;font-style:italic">${fr?'Aucun tag':'No tags'}</div></div>
+    </div>`;
+    const rightTicket = `<div style="flex:1;overflow-y:auto;padding:14px">
+      <div style="font-size:14px;font-weight:700;margin-bottom:4px">${subject}</div>
+      <div style="font-size:11px;color:#68737D;margin-bottom:16px">${fr?'Via formulaire web':'Via web form'}</div>
+      <div style="background:#F9FAFB;border-radius:6px;padding:12px 14px;font-size:12px;color:#2F3941">${fr?'Bonjour, je n\'arrive plus à me connecter à mon compte depuis ce matin. Pouvez-vous m\'aider ?':'Hello, I can no longer log in to my account since this morning. Can you help?'}</div>
+    </div>`;
+    return `<div style="display:flex;flex-direction:column;height:380px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow:hidden;border:1px solid #D8DCDE;border-radius:4px">${tabs}<div style="display:flex;flex:1;overflow:hidden">${leftTicket}${rightTicket}</div></div>`;
+  }
+
+  // ── USER states (user / dropdown / phone) ──
+  const dropdown = `<div style="background:white;border:1px solid #D8DCDE;border-radius:4px;box-shadow:0 3px 10px rgba(0,0,0,.12);margin-bottom:6px">
     <div style="padding:8px 14px;font-size:12px;color:#2F3941;cursor:pointer;border-bottom:1px solid #F3F4F6" onmouseover="this.style.background='#F3F4F6'" onmouseout="this.style.background=''">Email</div>
     <div style="padding:8px 14px;font-size:12px;color:#2F3941;cursor:pointer;border-bottom:1px solid #F3F4F6" onmouseover="this.style.background='#F3F4F6'" onmouseout="this.style.background=''">X Corp</div>
     <div style="padding:8px 14px;font-size:12px;color:#2F3941;cursor:pointer;border-bottom:1px solid #F3F4F6" onmouseover="this.style.background='#F3F4F6'" onmouseout="this.style.background=''">Facebook</div>
     <div style="padding:8px 14px;font-size:12px;color:#2F3941;cursor:pointer;font-weight:600" onclick="simUpShowPhone()" onmouseover="this.style.background='#F3F4F6'" onmouseout="this.style.background=''">Phone</div>
   </div>`;
 
-  const phoneInput = `<div id="up-phone-wrap" style="margin-bottom:6px">
+  const phoneInput = `<div style="margin-bottom:6px">
     <input id="up-phone-input" type="tel" placeholder="+1 555 000 0000" style="border:1px solid #1F73B7;border-radius:4px;padding:5px 9px;font-size:12px;width:100%;box-sizing:border-box;outline:none" oninput="simUpCheckSave()" onkeydown="if(event.key==='Enter')simUpSave()">
     <div style="margin-top:4px;display:flex;justify-content:flex-end">
       <button id="up-save-btn" onclick="simUpSave()" disabled style="background:#C8D0D6;color:white;border:none;border-radius:4px;padding:4px 12px;font-size:11px;cursor:not-allowed">Save</button>
     </div>
   </div>`;
 
-  const leftContent = state === 'dropdown'
-    ? `${dropdown}<div style="color:#1F73B7;font-size:12px;cursor:pointer">+ add contact</div>`
-    : state === 'phone'
-    ? phoneInput
-    : `<div id="up-add-contact" onclick="simUpAddContact()" style="color:#1F73B7;font-size:12px;cursor:pointer;margin-bottom:6px">+ add contact</div>`;
+  const addContactLink = `<div id="up-add-contact" onclick="simUpAddContact()" style="color:#1F73B7;font-size:12px;cursor:pointer;margin-bottom:6px">+ add contact</div>`;
 
-  const left = `<div style="width:190px;flex-shrink:0;padding:14px;border-right:1px solid #D8DCDE;overflow-y:auto;font-size:12px">
+  const leftUser = `<div style="width:190px;flex-shrink:0;padding:14px;border-right:1px solid #D8DCDE;overflow-y:auto;font-size:12px">
     <div style="margin-bottom:10px"><span style="color:#68737D;font-size:11px">${fr?'Email principal':'Primary email'}</span><br><span style="color:#2F3941">${email}</span></div>
-    <div style="margin-bottom:10px"><span style="color:#68737D;font-size:11px">Phone</span><br><span style="color:#68737D;font-style:italic">—</span></div>
-    ${leftContent}
+    <div style="margin-bottom:8px"><span style="color:#68737D;font-size:11px">Phone</span><br><span style="color:#68737D;font-style:italic">—</span></div>
+    ${state === 'dropdown' ? dropdown + addContactLink : state === 'phone' ? phoneInput : addContactLink}
     <div style="margin-top:10px"><span style="color:#68737D;font-size:11px">Org.</span><br><span style="color:#1F73B7">${orgName}</span></div>
     <div style="margin-top:10px"><span style="color:#68737D;font-size:11px">Language</span><br><span>English (US)</span></div>
   </div>`;
 
-  const right = `<div style="flex:1;padding:14px;overflow-y:auto">
+  const rightUser = `<div style="flex:1;padding:14px;overflow-y:auto">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
       <div style="width:34px;height:34px;border-radius:50%;background:#D8DCDE;display:flex;align-items:center;justify-content:center;font-size:15px">👤</div>
       <div style="font-size:14px;font-weight:700">${userName}</div>
     </div>
     <div style="display:flex;gap:14px;border-bottom:1px solid #D8DCDE;margin-bottom:10px;font-size:12px">
-      <div style="padding:5px 0;border-bottom:2px solid #1F73B7;color:#1F73B7;font-weight:600">${fr?'Tickets (3)':'Tickets (3)'}</div>
-      <div style="padding:5px 0;color:#68737D">Help center</div>
-      <div style="padding:5px 0;color:#68737D">Related</div>
+      <div style="padding:5px 0;border-bottom:2px solid #1F73B7;color:#1F73B7;font-weight:600">Tickets (3)</div>
+      <div style="padding:5px 0;color:#68737D;cursor:pointer">Help center</div>
+      <div style="padding:5px 0;color:#68737D;cursor:pointer">Related</div>
     </div>
-    <div style="font-size:12px;display:flex;flex-direction:column;gap:0">
-      <div style="display:flex;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid #F3F4F6"><span style="background:#CC3340;color:white;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700">Open</span><span>#2048 – ${fr?'Problème de connexion':'Login issue'}</span></div>
+    <div style="font-size:12px">
+      <div style="display:flex;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid #F3F4F6"><span style="background:#CC3340;color:white;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700">Open</span><span>#2048 – ${subject}</span></div>
       <div style="display:flex;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid #F3F4F6"><span style="background:#828F99;color:white;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700">Solved</span><span>#1987 – ${fr?'Demande de remboursement':'Refund request'}</span></div>
       <div style="display:flex;gap:8px;align-items:center;padding:7px 0"><span style="background:#828F99;color:white;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700">Solved</span><span>#1654 – ${fr?'Question facturation':'Billing question'}</span></div>
     </div>
   </div>`;
 
-  return `<div style="display:flex;flex-direction:column;height:380px;font-size:13px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow:hidden;border:1px solid #D8DCDE;border-radius:4px">
-    ${tabs}
-    <div style="display:flex;flex:1;overflow:hidden">${left}${right}</div>
-  </div>`;
+  return `<div style="display:flex;flex-direction:column;height:380px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow:hidden;border:1px solid #D8DCDE;border-radius:4px">${tabs}<div style="display:flex;flex:1;overflow:hidden">${leftUser}${rightUser}</div></div>`;
+}
+
+function simUpGoToUser() {
+  const fr = window._simL === 'fr';
+  document.getElementById('zd-sim-area').innerHTML = buildUserProfileHtml(fr, 'user');
+  const instrEl = document.getElementById('sim-instruction-text');
+  if (instrEl) instrEl.innerHTML = fr ? 'Vous êtes sur le profil. Cliquez sur <strong>+ add contact</strong>, choisissez <strong>Phone</strong>, entrez le numéro et sauvegardez.' : 'You\'re on the profile. Click <strong>+ add contact</strong>, choose <strong>Phone</strong>, enter the number and save.';
+  setTimeout(() => highlightTarget({element:'up-add-contact'}), 100);
 }
 
 function simUpAddContact() {
-  const sim = document.getElementById('zd-sim-area');
   const fr = window._simL === 'fr';
-  if (sim) sim.querySelector('.zd-sim > div, .zd-sim').innerHTML = buildUserProfileHtml(fr, 'dropdown');
-  // re-render just the scene
-  sim.innerHTML = buildUserProfileHtml(fr, 'dropdown');
+  document.getElementById('zd-sim-area').innerHTML = buildUserProfileHtml(fr, 'dropdown');
   const instrEl = document.getElementById('sim-instruction-text');
-  if (instrEl) instrEl.textContent = fr ? 'Parfait ! Choisissez maintenant "Phone" dans la liste.' : 'Good! Now select "Phone" from the list.';
+  if (instrEl) instrEl.textContent = fr ? 'Choisissez "Phone" dans la liste.' : 'Choose "Phone" from the list.';
 }
 
 function simUpShowPhone() {
-  const sim = document.getElementById('zd-sim-area');
   const fr = window._simL === 'fr';
-  sim.innerHTML = buildUserProfileHtml(fr, 'phone');
+  document.getElementById('zd-sim-area').innerHTML = buildUserProfileHtml(fr, 'phone');
   const instrEl = document.getElementById('sim-instruction-text');
-  if (instrEl) instrEl.textContent = fr ? 'Saisissez le numéro de téléphone et appuyez sur Save.' : 'Enter the phone number and click Save.';
+  if (instrEl) instrEl.textContent = fr ? 'Saisissez le numéro et cliquez Save.' : 'Enter the number and click Save.';
   setTimeout(() => { const inp = document.getElementById('up-phone-input'); if (inp) inp.focus(); }, 50);
 }
 

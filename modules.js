@@ -303,8 +303,8 @@ const MODULES = [
       exercise:{
         type:'sim',
         scene:'user-profile',
-        instruction:{fr:"Le client vient de vous donner son numéro de téléphone. Ajoutez-le à son profil : cliquez sur <strong>+ add contact</strong>, choisissez <strong>Phone</strong>, saisissez le numéro et sauvegardez.",en:"The customer just gave you their phone number. Add it to their profile: click <strong>+ add contact</strong>, choose <strong>Phone</strong>, enter the number and save."},
-        setup:{ requester:'Alex Martin', org:'NovaTech', email:'alex.martin@novatech.com' },
+        instruction:{fr:"Le client vient de vous donner son numéro de téléphone. Commencez par cliquer sur l'onglet <strong>Alex Martin</strong> pour accéder à son profil.",en:"The customer just gave you their phone number. Start by clicking the <strong>Alex Martin</strong> tab to access their profile."},
+        setup:{ requester:'Alex Martin', org:'NovaTech', email:'alex.martin@novatech.com', subject:'Login issue' },
         target:{ action:'add-phone', element:'up-add-contact' },
         feedback:{
           correct:{fr:'Parfait ! Le numéro est sauvegardé directement dans le profil utilisateur — disponible pour toute l\'équipe sur tous ses futurs tickets.',en:'Well done! The number is saved directly in the user profile — available for the whole team on all their future tickets.'},
