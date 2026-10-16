@@ -827,7 +827,7 @@ function getCmPhaseHtml(phase, fr) {
       </div>
       <div style="flex:1;background:#F3F4F6;overflow:hidden">
         <div style="background:white;border-bottom:1px solid #D8DCDE;padding:8px 16px;display:flex;gap:10px">
-          <span style="background:#E8E8E8;padding:3px 10px;border-radius:12px;font-size:11px">👤 Kim GIRAUD-BONNE ×</span>
+          <span style="background:#E8E8E8;padding:3px 10px;border-radius:12px;font-size:11px">👤 Alex MARTIN ×</span>
           <span style="background:#E8E8E8;padding:3px 10px;border-radius:12px;font-size:11px">🎧 EXEMPLE : Fonctionn... #1 ×</span>
         </div>
         <div style="padding:20px;color:#49545C">
