@@ -323,8 +323,8 @@ const MODULES = [
       exercise:{
         type:'sim',
         scene:'org-create',
-        instruction:{fr:"Ce client n'a pas encore d'organisation. Cliquez sur l'onglet <strong>Organization (create)</strong>, entrez le nom de la société et cliquez <strong>Add</strong>.",en:"This customer has no organization yet. Click the <strong>Organization (create)</strong> tab, enter the company name and click <strong>Add</strong>."},
-        setup:{ requester:'Alex Martin' },
+        instruction:{fr:"Ce client n'a pas encore d'organisation. Regardez les onglets en haut : cliquez sur <strong>Organisation (créer)</strong> pour créer sa société.",en:"This customer has no organization yet. Look at the tabs at the top: click <strong>Organization (create)</strong> to create their company."},
+        setup:{ requester:'Alex Martin', subject:'Login issue' },
         target:{ action:'create-org', element:'oc-tab' },
         feedback:{
           correct:{fr:'Parfait ! L\'organisation est créée et rattachée à l\'utilisateur. L\'onglet "Organization (create)" disparaît et le nom de la société le remplace.',en:'Well done! The organization is created and linked to the user. The "Organization (create)" tab disappears and the company name takes its place.'},
