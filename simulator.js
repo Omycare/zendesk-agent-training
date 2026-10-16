@@ -1035,19 +1035,36 @@ function buildUserProfileHtml(fr, state) {
 
   // ── TICKET state ──
   if (state === 'ticket') {
-    const leftTicket = `<div style="width:200px;flex-shrink:0;padding:14px;border-right:1px solid #D8DCDE;font-size:12px;overflow-y:auto">
-      <div style="margin-bottom:12px"><div style="font-size:10px;font-weight:600;color:#49545C;text-transform:uppercase;margin-bottom:4px">Brand</div><div style="border:1px solid #D8DCDE;border-radius:4px;padding:5px 9px;color:#2F3941">NovaTech</div></div>
-      <div style="margin-bottom:12px"><div style="font-size:10px;font-weight:600;color:#49545C;text-transform:uppercase;margin-bottom:4px">Requester</div><div style="border:1px solid #D8DCDE;border-radius:4px;padding:5px 9px;color:#2F3941">${userName}</div></div>
-      <div style="margin-bottom:12px"><div style="font-size:10px;font-weight:600;color:#49545C;text-transform:uppercase;margin-bottom:4px">Assignee</div><div style="border:1px solid #D8DCDE;border-radius:4px;padding:5px 9px;color:#68737D">—</div></div>
-      <div style="margin-bottom:12px"><div style="font-size:10px;font-weight:600;color:#49545C;text-transform:uppercase;margin-bottom:4px">Followers</div><div style="border:1px solid #D8DCDE;border-radius:4px;padding:5px 9px;color:#68737D">—</div></div>
-      <div><div style="font-size:10px;font-weight:600;color:#49545C;text-transform:uppercase;margin-bottom:4px">Tags</div><div style="border:1px solid #D8DCDE;border-radius:4px;padding:5px 9px;color:#68737D;font-style:italic">${fr?'Aucun tag':'No tags'}</div></div>
+    const leftTicket = `<div style="width:160px;flex-shrink:0;padding:11px;border-right:1px solid #D8DCDE;font-size:12px;overflow-y:auto">
+      <div style="margin-bottom:9px"><div style="font-size:10px;font-weight:600;color:#49545C;text-transform:uppercase;margin-bottom:3px">Brand</div><div style="border:1px solid #D8DCDE;border-radius:4px;padding:4px 8px;color:#2F3941">NovaTech</div></div>
+      <div style="margin-bottom:9px"><div style="font-size:10px;font-weight:600;color:#49545C;text-transform:uppercase;margin-bottom:3px">Requester</div><div style="border:1px solid #D8DCDE;border-radius:4px;padding:4px 8px;color:#2F3941">${userName}</div></div>
+      <div style="margin-bottom:9px"><div style="font-size:10px;font-weight:600;color:#49545C;text-transform:uppercase;margin-bottom:3px">Assignee</div><div style="border:1px solid #D8DCDE;border-radius:4px;padding:4px 8px;color:#68737D">—</div></div>
+      <div style="margin-bottom:9px"><div style="font-size:10px;font-weight:600;color:#49545C;text-transform:uppercase;margin-bottom:3px">Followers</div><div style="border:1px solid #D8DCDE;border-radius:4px;padding:4px 8px;color:#68737D">—</div></div>
+      <div><div style="font-size:10px;font-weight:600;color:#49545C;text-transform:uppercase;margin-bottom:3px">Tags</div><div style="border:1px solid #D8DCDE;border-radius:4px;padding:4px 8px;color:#68737D;font-style:italic">${fr?'Aucun tag':'No tags'}</div></div>
     </div>`;
-    const rightTicket = `<div style="flex:1;overflow-y:auto;padding:14px">
-      <div style="font-size:14px;font-weight:700;margin-bottom:4px">${subject}</div>
-      <div style="font-size:11px;color:#68737D;margin-bottom:16px">${fr?'Via formulaire web':'Via web form'}</div>
-      <div style="background:#F9FAFB;border-radius:6px;padding:12px 14px;font-size:12px;color:#2F3941">${fr?'Bonjour, je n\'arrive plus à me connecter à mon compte depuis ce matin. Pouvez-vous m\'aider ?':'Hello, I can no longer log in to my account since this morning. Can you help?'}</div>
+    const centerTicket = `<div style="flex:1;overflow-y:auto;padding:11px;border-right:1px solid #D8DCDE">
+      <div style="font-size:13px;font-weight:700;margin-bottom:3px">${subject}</div>
+      <div style="font-size:11px;color:#68737D;margin-bottom:12px">${fr?'Via formulaire web':'Via web form'}</div>
+      <div style="display:flex;gap:8px;align-items:flex-start">
+        <div style="width:26px;height:26px;border-radius:50%;background:#D8DCDE;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0">👤</div>
+        <div style="background:#F3F4F6;border-radius:6px;padding:9px 11px;font-size:12px;color:#2F3941;flex:1">${fr?'Bonjour, je n\'arrive plus à me connecter à mon compte depuis ce matin.':'Hello, I can no longer log in to my account since this morning.'}</div>
+      </div>
     </div>`;
-    return `<div style="display:flex;flex-direction:column;height:380px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow:hidden;border:1px solid #D8DCDE;border-radius:4px">${tabs}<div style="display:flex;flex:1;overflow:hidden">${leftTicket}${rightTicket}</div></div>`;
+    const rightPreview = `<div style="width:170px;flex-shrink:0;padding:11px;overflow-y:auto;font-size:12px;background:#FAFAFA">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:11px">
+        <div style="width:30px;height:30px;border-radius:50%;background:#C2D1D9;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">👤</div>
+        <div style="font-weight:700;font-size:13px;line-height:1.2">${userName}</div>
+      </div>
+      <div style="margin-bottom:7px"><div style="color:#68737D;font-size:10px;text-transform:uppercase;font-weight:600;margin-bottom:2px">Email</div><div style="color:#1F73B7;word-break:break-all">${email}</div></div>
+      <div style="margin-bottom:7px"><div style="color:#68737D;font-size:10px;text-transform:uppercase;font-weight:600;margin-bottom:2px">Org.</div><div style="color:#1F73B7">${orgName}</div></div>
+      <div style="margin-bottom:7px"><div style="color:#68737D;font-size:10px;text-transform:uppercase;font-weight:600;margin-bottom:2px">${fr?'Heure locale':'Local time'}</div><div>10:24 AM</div></div>
+      <div style="margin-bottom:7px"><div style="color:#68737D;font-size:10px;text-transform:uppercase;font-weight:600;margin-bottom:2px">Language</div><div>English (US)</div></div>
+      <div style="margin-bottom:7px"><div style="color:#68737D;font-size:10px;text-transform:uppercase;font-weight:600;margin-bottom:2px">Notes</div><div style="color:#68737D;font-style:italic">—</div></div>
+      <div style="padding-top:9px;border-top:1px solid #D8DCDE">
+        <div style="color:#68737D;font-size:11px">3 ${fr?'interactions':'interactions'}</div>
+      </div>
+    </div>`;
+    return `<div style="display:flex;flex-direction:column;height:380px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow:hidden;border:1px solid #D8DCDE;border-radius:4px">${tabs}<div style="display:flex;flex:1;overflow:hidden">${leftTicket}${centerTicket}${rightPreview}</div></div>`;
   }
 
   // ── USER states (user / dropdown / phone) ──
@@ -1137,27 +1154,45 @@ function buildOrgCreateHtml(fr, state) {
   const subject  = s.subject  || (fr ? 'Problème de connexion' : 'Login issue');
   const tabOrg   = fr ? 'Organisation (créer)' : 'Organization (create)';
 
-  // Tab bar — "Organization (create)" is always clickable
+  // Tab bar
+  const isTicketActive = state === 'ticket';
   const tabs = `<div style="display:flex;border-bottom:1px solid #D8DCDE;background:white;font-size:12px;flex-shrink:0">
-    <div onclick="simOcOpenModal()" style="padding:9px 16px;color:#1F73B7;font-weight:600;cursor:pointer;border-bottom:2px solid #1F73B7">${tabOrg}</div>
     <div style="padding:9px 16px;color:#49545C;cursor:pointer">${userName}</div>
-    <div style="padding:9px 16px;color:${state==='ticket'?'#1F73B7':'#49545C'};font-weight:${state==='ticket'?'600':'400'};display:flex;gap:5px;align-items:center;${state==='ticket'?'border-bottom:2px solid #1F73B7':''}"><span style="background:#F79A3E;color:white;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700">New</span>Ticket</div>
+    <div onclick="simOcOpenModal()" style="padding:9px 16px;color:${isTicketActive?'#49545C':'#1F73B7'};font-weight:${isTicketActive?'400':'600'};cursor:pointer;${isTicketActive?'':'border-bottom:2px solid #1F73B7'}" onmouseover="this.style.color='#1F73B7'" onmouseout="this.style.color='${isTicketActive?'#49545C':'#1F73B7}'">${tabOrg}</div>
+    <div style="padding:9px 16px;color:${isTicketActive?'#1F73B7':'#49545C'};font-weight:${isTicketActive?'600':'400'};display:flex;gap:5px;align-items:center;${isTicketActive?'border-bottom:2px solid #1F73B7':''}"><span style="background:#F79A3E;color:white;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700">New</span>Ticket</div>
   </div>`;
 
   // ── TICKET state ──
   if (state === 'ticket') {
-    const leftTicket = `<div style="width:200px;flex-shrink:0;padding:14px;border-right:1px solid #D8DCDE;font-size:12px;overflow-y:auto">
-      <div style="margin-bottom:12px"><div style="font-size:10px;font-weight:600;color:#49545C;text-transform:uppercase;margin-bottom:4px">Requester</div><div style="border:1px solid #D8DCDE;border-radius:4px;padding:5px 9px;color:#2F3941">${userName}</div></div>
-      <div style="margin-bottom:12px"><div style="font-size:10px;font-weight:600;color:#49545C;text-transform:uppercase;margin-bottom:4px">Assignee</div><div style="border:1px solid #D8DCDE;border-radius:4px;padding:5px 9px;color:#68737D">—</div></div>
-      <div style="margin-bottom:12px"><div style="font-size:10px;font-weight:600;color:#49545C;text-transform:uppercase;margin-bottom:4px">Followers</div><div style="border:1px solid #D8DCDE;border-radius:4px;padding:5px 9px;color:#68737D">—</div></div>
-      <div><div style="font-size:10px;font-weight:600;color:#49545C;text-transform:uppercase;margin-bottom:4px">Tags</div><div style="border:1px solid #D8DCDE;border-radius:4px;padding:5px 9px;color:#68737D;font-style:italic">${fr?'Aucun tag':'No tags'}</div></div>
+    const email = s.email || 'alex.martin@novatech.com';
+    const leftTicket = `<div style="width:160px;flex-shrink:0;padding:11px;border-right:1px solid #D8DCDE;font-size:12px;overflow-y:auto">
+      <div style="margin-bottom:9px"><div style="font-size:10px;font-weight:600;color:#49545C;text-transform:uppercase;margin-bottom:3px">Requester</div><div style="border:1px solid #D8DCDE;border-radius:4px;padding:4px 8px;color:#2F3941">${userName}</div></div>
+      <div style="margin-bottom:9px"><div style="font-size:10px;font-weight:600;color:#49545C;text-transform:uppercase;margin-bottom:3px">Assignee</div><div style="border:1px solid #D8DCDE;border-radius:4px;padding:4px 8px;color:#68737D">—</div></div>
+      <div style="margin-bottom:9px"><div style="font-size:10px;font-weight:600;color:#49545C;text-transform:uppercase;margin-bottom:3px">Followers</div><div style="border:1px solid #D8DCDE;border-radius:4px;padding:4px 8px;color:#68737D">—</div></div>
+      <div><div style="font-size:10px;font-weight:600;color:#49545C;text-transform:uppercase;margin-bottom:3px">Tags</div><div style="border:1px solid #D8DCDE;border-radius:4px;padding:4px 8px;color:#68737D;font-style:italic">${fr?'Aucun tag':'No tags'}</div></div>
     </div>`;
-    const rightTicket = `<div style="flex:1;overflow-y:auto;padding:14px">
-      <div style="font-size:14px;font-weight:700;margin-bottom:4px">${subject}</div>
-      <div style="font-size:11px;color:#68737D;margin-bottom:16px">${fr?'Via formulaire web':'Via web form'}</div>
-      <div style="background:#F9FAFB;border-radius:6px;padding:12px 14px;font-size:12px;color:#2F3941">${fr?'Bonjour, je n\'arrive plus à me connecter à mon compte depuis ce matin.':'Hello, I can no longer log in to my account since this morning.'}</div>
+    const centerTicket = `<div style="flex:1;overflow-y:auto;padding:11px;border-right:1px solid #D8DCDE">
+      <div style="font-size:13px;font-weight:700;margin-bottom:3px">${subject}</div>
+      <div style="font-size:11px;color:#68737D;margin-bottom:12px">${fr?'Via formulaire web':'Via web form'}</div>
+      <div style="display:flex;gap:8px;align-items:flex-start">
+        <div style="width:26px;height:26px;border-radius:50%;background:#D8DCDE;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0">👤</div>
+        <div style="background:#F3F4F6;border-radius:6px;padding:9px 11px;font-size:12px;color:#2F3941;flex:1">${fr?'Bonjour, je n\'arrive plus à me connecter à mon compte depuis ce matin.':'Hello, I can no longer log in to my account since this morning.'}</div>
+      </div>
     </div>`;
-    return `<div style="position:relative;display:flex;flex-direction:column;height:380px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow:hidden;border:1px solid #D8DCDE;border-radius:4px">${tabs}<div style="display:flex;flex:1;overflow:hidden">${leftTicket}${rightTicket}</div></div>`;
+    const rightPreview = `<div style="width:170px;flex-shrink:0;padding:11px;overflow-y:auto;font-size:12px;background:#FAFAFA">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:11px">
+        <div style="width:30px;height:30px;border-radius:50%;background:#C2D1D9;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">👤</div>
+        <div style="font-weight:700;font-size:13px;line-height:1.2">${userName}</div>
+      </div>
+      <div style="margin-bottom:7px"><div style="color:#68737D;font-size:10px;text-transform:uppercase;font-weight:600;margin-bottom:2px">Email</div><div style="color:#1F73B7;word-break:break-all">${email}</div></div>
+      <div style="margin-bottom:7px"><div style="color:#68737D;font-size:10px;text-transform:uppercase;font-weight:600;margin-bottom:2px">Org.</div><div style="color:#68737D;font-style:italic">—</div></div>
+      <div style="margin-bottom:7px"><div style="color:#68737D;font-size:10px;text-transform:uppercase;font-weight:600;margin-bottom:2px">${fr?'Heure locale':'Local time'}</div><div>10:24 AM</div></div>
+      <div style="margin-bottom:7px"><div style="color:#68737D;font-size:10px;text-transform:uppercase;font-weight:600;margin-bottom:2px">Language</div><div>English (US)</div></div>
+      <div style="padding-top:9px;border-top:1px solid #D8DCDE">
+        <div style="color:#68737D;font-size:11px">1 ${fr?'interaction':'interaction'}</div>
+      </div>
+    </div>`;
+    return `<div style="position:relative;display:flex;flex-direction:column;height:380px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow:hidden;border:1px solid #D8DCDE;border-radius:4px">${tabs}<div style="display:flex;flex:1;overflow:hidden">${leftTicket}${centerTicket}${rightPreview}</div></div>`;
   }
 
   // ── ORG state (empty org panel) + optional modal ──
