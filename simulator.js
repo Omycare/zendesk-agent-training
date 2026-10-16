@@ -1059,10 +1059,8 @@ function buildUserProfileHtml(fr, state) {
   </div>`;
 
   const phoneInput = `<div style="margin-bottom:6px">
-    <input id="up-phone-input" type="tel" placeholder="+1 555 000 0000" style="border:1px solid #1F73B7;border-radius:4px;padding:5px 9px;font-size:12px;width:100%;box-sizing:border-box;outline:none" oninput="simUpCheckSave()" onkeydown="if(event.key==='Enter')simUpSave()">
-    <div style="margin-top:4px;display:flex;justify-content:flex-end">
-      <button id="up-save-btn" onclick="simUpSave()" disabled style="background:#C8D0D6;color:white;border:none;border-radius:4px;padding:4px 12px;font-size:11px;cursor:not-allowed">Save</button>
-    </div>
+    <input id="up-phone-input" type="tel" placeholder="+1 555 000 0000" style="border:1px solid #1F73B7;border-radius:4px;padding:5px 9px;font-size:12px;width:100%;box-sizing:border-box;outline:none" onblur="simUpSave()" onkeydown="if(event.key==='Enter')this.blur()">
+    <div style="margin-top:3px;font-size:11px;color:#68737D">${fr?'Cliquez ailleurs pour sauvegarder automatiquement':'Click anywhere else to save automatically'}</div>
   </div>`;
 
   const addContactLink = `<div id="up-add-contact" onclick="simUpAddContact()" style="color:#1F73B7;font-size:12px;cursor:pointer;margin-bottom:6px">+ add contact</div>`;
@@ -1114,18 +1112,8 @@ function simUpShowPhone() {
   const fr = window._simL === 'fr';
   document.getElementById('zd-sim-area').innerHTML = buildUserProfileHtml(fr, 'phone');
   const instrEl = document.getElementById('sim-instruction-text');
-  if (instrEl) instrEl.textContent = fr ? 'Saisissez le numéro et cliquez Save.' : 'Enter the number and click Save.';
+  if (instrEl) instrEl.textContent = fr ? 'Saisissez le numéro puis cliquez ailleurs pour sauvegarder.' : 'Enter the number then click anywhere else to save.';
   setTimeout(() => { const inp = document.getElementById('up-phone-input'); if (inp) inp.focus(); }, 50);
-}
-
-function simUpCheckSave() {
-  const inp = document.getElementById('up-phone-input');
-  const btn = document.getElementById('up-save-btn');
-  if (!btn) return;
-  const ok = inp && inp.value.trim().length > 3;
-  btn.disabled = !ok;
-  btn.style.background = ok ? '#1F73B7' : '#C8D0D6';
-  btn.style.cursor = ok ? 'pointer' : 'not-allowed';
 }
 
 function simUpSave() {
