@@ -928,38 +928,73 @@ function simCmAdvance() {
 
 function simCmAddAction() {
   const list = document.getElementById('cm-actions-list');
-  if (!list || list.children.length > 0) return;
+  if (!list || list.children.length >= 2) return;
   const fr = window._simL === 'fr';
   const addBtn = document.getElementById('add-action-btn');
-  if (addBtn) addBtn.style.display = 'none';
-  list.innerHTML = `<div style="border:1px solid #D8DCDE;border-radius:6px;padding:10px 12px;margin-bottom:10px">
+  list.insertAdjacentHTML('beforeend', `<div class="cm-action-row" style="border:1px solid #D8DCDE;border-radius:6px;padding:10px 12px;margin-bottom:10px">
     <div style="display:flex;gap:8px;align-items:flex-start">
-      <select style="border:1px solid #D8DCDE;border-radius:4px;padding:5px 8px;font-size:12px;flex-shrink:0">
-        <option>${fr?'Commentaire du ticket':'Ticket comment'}</option>
-        <option>${fr?'Statut':'Status'}</option>
-        <option>${fr?'Priorité':'Priority'}</option>
-        <option>${fr?'Assigné à':'Assignee'}</option>
+      <select onchange="simCmActionTypeChange(this)" style="border:1px solid #D8DCDE;border-radius:4px;padding:5px 8px;font-size:12px;flex-shrink:0">
+        <option value="comment">${fr?'Commentaire du ticket':'Ticket comment'}</option>
+        <option value="status">${fr?'Statut':'Status'}</option>
+        <option value="priority">${fr?'Priorité':'Priority'}</option>
+        <option value="assignee">${fr?'Assigné à':'Assignee'}</option>
       </select>
-      <div style="flex:1">
+      <div class="cm-action-content" style="flex:1">
         <div style="display:flex;gap:4px;margin-bottom:6px">
-          <button style="font-size:11px;border:1px solid #1F73B7;background:#EBF5FB;color:#1F73B7;border-radius:3px;padding:2px 8px;cursor:pointer">${fr?'Public':'Public'}</button>
-          <button style="font-size:11px;border:1px solid #D8DCDE;background:white;color:#49545C;border-radius:3px;padding:2px 8px;cursor:pointer">${fr?'Interne':'Internal'}</button>
+          <button class="cm-mode-btn" onclick="simCmToggleMode(this)" style="font-size:11px;border:1px solid #1F73B7;background:#EBF5FB;color:#1F73B7;border-radius:3px;padding:2px 8px;cursor:pointer">${fr?'Public':'Public'}</button>
+          <button class="cm-mode-btn" onclick="simCmToggleMode(this)" style="font-size:11px;border:1px solid #D8DCDE;background:white;color:#49545C;border-radius:3px;padding:2px 8px;cursor:pointer">${fr?'Interne':'Internal'}</button>
         </div>
-        <textarea id="cm-action-text" placeholder="${fr?'Bonjour {{ticket.requester.first_name}}, Nous n\'avons pas eu de vos nouvelles...':'Hello {{ticket.requester.first_name}}, We haven\'t heard from you...'}" style="width:100%;border:1px solid #D8DCDE;border-radius:4px;padding:6px 8px;font-size:12px;min-height:65px;resize:vertical;box-sizing:border-box;outline:none" oninput="simCmCheckForm()" onfocus="this.style.borderColor='#1F73B7'" onblur="this.style.borderColor='#D8DCDE'"></textarea>
+        <textarea class="cm-action-text" placeholder="${fr?'Bonjour {{ticket.requester.first_name}}, Nous n\'avons pas eu de vos nouvelles...':'Hello {{ticket.requester.first_name}}, We haven\'t heard from you...'}" style="width:100%;border:1px solid #D8DCDE;border-radius:4px;padding:6px 8px;font-size:12px;min-height:65px;resize:vertical;box-sizing:border-box;outline:none" oninput="simCmCheckForm()" onfocus="this.style.borderColor='#1F73B7'" onblur="this.style.borderColor='#D8DCDE'"></textarea>
       </div>
-      <button onclick="this.closest('div').parentElement.remove();document.getElementById('add-action-btn').style.display='';simCmCheckForm()" style="color:#CC3340;border:none;background:none;cursor:pointer;font-size:18px;flex-shrink:0;line-height:1">×</button>
+      <button onclick="this.closest('.cm-action-row').remove();document.getElementById('add-action-btn').style.display='';simCmCheckForm()" style="color:#CC3340;border:none;background:none;cursor:pointer;font-size:18px;flex-shrink:0;line-height:1">×</button>
     </div>
-  </div>`;
+  </div>`);
+  if (list.children.length >= 2 && addBtn) addBtn.style.display = 'none';
+  simCmCheckForm();
+}
+
+function simCmToggleMode(btn) {
+  const content = btn.closest('.cm-action-content');
+  if (!content) return;
+  content.querySelectorAll('.cm-mode-btn').forEach(b => {
+    b.style.borderColor = '#D8DCDE';
+    b.style.background = 'white';
+    b.style.color = '#49545C';
+  });
+  btn.style.borderColor = '#1F73B7';
+  btn.style.background = '#EBF5FB';
+  btn.style.color = '#1F73B7';
+}
+
+function simCmActionTypeChange(select) {
+  const fr = window._simL === 'fr';
+  const row = select.closest('.cm-action-row');
+  const content = row.querySelector('.cm-action-content');
+  const val = select.value;
+  if (val === 'comment') {
+    content.innerHTML = `<div style="display:flex;gap:4px;margin-bottom:6px">
+      <button class="cm-mode-btn" onclick="simCmToggleMode(this)" style="font-size:11px;border:1px solid #1F73B7;background:#EBF5FB;color:#1F73B7;border-radius:3px;padding:2px 8px;cursor:pointer">${fr?'Public':'Public'}</button>
+      <button class="cm-mode-btn" onclick="simCmToggleMode(this)" style="font-size:11px;border:1px solid #D8DCDE;background:white;color:#49545C;border-radius:3px;padding:2px 8px;cursor:pointer">${fr?'Interne':'Internal'}</button>
+    </div>
+    <textarea class="cm-action-text" placeholder="${fr?'Bonjour {{ticket.requester.first_name}}...':'Hello {{ticket.requester.first_name}}...'}" style="width:100%;border:1px solid #D8DCDE;border-radius:4px;padding:6px 8px;font-size:12px;min-height:65px;resize:vertical;box-sizing:border-box;outline:none" oninput="simCmCheckForm()" onfocus="this.style.borderColor='#1F73B7'" onblur="this.style.borderColor='#D8DCDE'"></textarea>`;
+  } else {
+    const opts = {
+      status:   fr ? ['Ouvert','En attente','En attente interne','Résolu']  : ['Open','Pending','On-hold','Solved'],
+      priority: fr ? ['Bas','Normal','Élevé','Urgent']                       : ['Low','Normal','High','Urgent'],
+      assignee: fr ? ['Non assigné','Moi']                                   : ['Unassigned','Me']
+    };
+    content.innerHTML = `<select style="border:1px solid #D8DCDE;border-radius:4px;padding:5px 8px;font-size:12px;min-width:160px">${(opts[val]||[]).map(o=>`<option>${o}</option>`).join('')}</select>`;
+  }
   simCmCheckForm();
 }
 
 function simCmCheckForm() {
   const name = document.getElementById('cm-name');
-  const actionText = document.getElementById('cm-action-text');
+  const list = document.getElementById('cm-actions-list');
   const saveBtn = document.getElementById('save-macro-btn');
   if (!saveBtn) return;
   const hasName = name && name.value.trim().length > 2;
-  const hasAction = !!actionText;
+  const hasAction = list && list.children.length > 0;
   if (hasName && hasAction) {
     saveBtn.disabled = false;
     saveBtn.style.background = '#1F73B7';
