@@ -1012,6 +1012,192 @@ function simCmSave() {
 
 // ── END CREATE MACRO SCENE ──────────────────────────────────────────────────
 
+// ── USER PROFILE SCENE (add contact) ────────────────────────────────────────
+function renderUserProfileScene(setup, L) {
+  const fr = L === 'fr';
+  window._upSetup = setup;
+  return buildUserProfileHtml(fr, 'initial');
+}
+
+function buildUserProfileHtml(fr, state) {
+  const s = window._upSetup || {};
+  const userName = s.requester || 'Alex Martin';
+  const orgName  = s.org || 'NovaTech';
+  const email    = s.email || 'alex.martin@novatech.com';
+
+  const tabs = `<div style="display:flex;border-bottom:1px solid #D8DCDE;background:white;font-size:12px;flex-shrink:0">
+    <div style="padding:9px 16px;border-bottom:2px solid #1F73B7;color:#1F73B7;font-weight:600;cursor:default">${userName}</div>
+    <div style="padding:9px 16px;color:#49545C;cursor:pointer">${orgName}</div>
+    <div style="padding:9px 16px;color:#49545C;display:flex;gap:5px;align-items:center"><span style="background:#CC3340;color:white;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700">Open</span>Ticket #2048</div>
+  </div>`;
+
+  const dropdown = `<div id="up-dropdown" style="background:white;border:1px solid #D8DCDE;border-radius:4px;box-shadow:0 3px 10px rgba(0,0,0,.12);margin-bottom:6px">
+    <div style="padding:8px 14px;font-size:12px;color:#2F3941;cursor:pointer;border-bottom:1px solid #F3F4F6" onmouseover="this.style.background='#F3F4F6'" onmouseout="this.style.background=''">Email</div>
+    <div style="padding:8px 14px;font-size:12px;color:#2F3941;cursor:pointer;border-bottom:1px solid #F3F4F6" onmouseover="this.style.background='#F3F4F6'" onmouseout="this.style.background=''">X Corp</div>
+    <div style="padding:8px 14px;font-size:12px;color:#2F3941;cursor:pointer;border-bottom:1px solid #F3F4F6" onmouseover="this.style.background='#F3F4F6'" onmouseout="this.style.background=''">Facebook</div>
+    <div style="padding:8px 14px;font-size:12px;color:#2F3941;cursor:pointer;font-weight:600" onclick="simUpShowPhone()" onmouseover="this.style.background='#F3F4F6'" onmouseout="this.style.background=''">Phone</div>
+  </div>`;
+
+  const phoneInput = `<div id="up-phone-wrap" style="margin-bottom:6px">
+    <input id="up-phone-input" type="tel" placeholder="+1 555 000 0000" style="border:1px solid #1F73B7;border-radius:4px;padding:5px 9px;font-size:12px;width:100%;box-sizing:border-box;outline:none" oninput="simUpCheckSave()" onkeydown="if(event.key==='Enter')simUpSave()">
+    <div style="margin-top:4px;display:flex;justify-content:flex-end">
+      <button id="up-save-btn" onclick="simUpSave()" disabled style="background:#C8D0D6;color:white;border:none;border-radius:4px;padding:4px 12px;font-size:11px;cursor:not-allowed">Save</button>
+    </div>
+  </div>`;
+
+  const leftContent = state === 'dropdown'
+    ? `${dropdown}<div style="color:#1F73B7;font-size:12px;cursor:pointer">+ add contact</div>`
+    : state === 'phone'
+    ? phoneInput
+    : `<div id="up-add-contact" onclick="simUpAddContact()" style="color:#1F73B7;font-size:12px;cursor:pointer;margin-bottom:6px">+ add contact</div>`;
+
+  const left = `<div style="width:190px;flex-shrink:0;padding:14px;border-right:1px solid #D8DCDE;overflow-y:auto;font-size:12px">
+    <div style="margin-bottom:10px"><span style="color:#68737D;font-size:11px">${fr?'Email principal':'Primary email'}</span><br><span style="color:#2F3941">${email}</span></div>
+    <div style="margin-bottom:10px"><span style="color:#68737D;font-size:11px">Phone</span><br><span style="color:#68737D;font-style:italic">—</span></div>
+    ${leftContent}
+    <div style="margin-top:10px"><span style="color:#68737D;font-size:11px">Org.</span><br><span style="color:#1F73B7">${orgName}</span></div>
+    <div style="margin-top:10px"><span style="color:#68737D;font-size:11px">Language</span><br><span>English (US)</span></div>
+  </div>`;
+
+  const right = `<div style="flex:1;padding:14px;overflow-y:auto">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <div style="width:34px;height:34px;border-radius:50%;background:#D8DCDE;display:flex;align-items:center;justify-content:center;font-size:15px">👤</div>
+      <div style="font-size:14px;font-weight:700">${userName}</div>
+    </div>
+    <div style="display:flex;gap:14px;border-bottom:1px solid #D8DCDE;margin-bottom:10px;font-size:12px">
+      <div style="padding:5px 0;border-bottom:2px solid #1F73B7;color:#1F73B7;font-weight:600">${fr?'Tickets (3)':'Tickets (3)'}</div>
+      <div style="padding:5px 0;color:#68737D">Help center</div>
+      <div style="padding:5px 0;color:#68737D">Related</div>
+    </div>
+    <div style="font-size:12px;display:flex;flex-direction:column;gap:0">
+      <div style="display:flex;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid #F3F4F6"><span style="background:#CC3340;color:white;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700">Open</span><span>#2048 – ${fr?'Problème de connexion':'Login issue'}</span></div>
+      <div style="display:flex;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid #F3F4F6"><span style="background:#828F99;color:white;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700">Solved</span><span>#1987 – ${fr?'Demande de remboursement':'Refund request'}</span></div>
+      <div style="display:flex;gap:8px;align-items:center;padding:7px 0"><span style="background:#828F99;color:white;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700">Solved</span><span>#1654 – ${fr?'Question facturation':'Billing question'}</span></div>
+    </div>
+  </div>`;
+
+  return `<div style="display:flex;flex-direction:column;height:380px;font-size:13px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow:hidden;border:1px solid #D8DCDE;border-radius:4px">
+    ${tabs}
+    <div style="display:flex;flex:1;overflow:hidden">${left}${right}</div>
+  </div>`;
+}
+
+function simUpAddContact() {
+  const sim = document.getElementById('zd-sim-area');
+  const fr = window._simL === 'fr';
+  if (sim) sim.querySelector('.zd-sim > div, .zd-sim').innerHTML = buildUserProfileHtml(fr, 'dropdown');
+  // re-render just the scene
+  sim.innerHTML = buildUserProfileHtml(fr, 'dropdown');
+  const instrEl = document.getElementById('sim-instruction-text');
+  if (instrEl) instrEl.textContent = fr ? 'Parfait ! Choisissez maintenant "Phone" dans la liste.' : 'Good! Now select "Phone" from the list.';
+}
+
+function simUpShowPhone() {
+  const sim = document.getElementById('zd-sim-area');
+  const fr = window._simL === 'fr';
+  sim.innerHTML = buildUserProfileHtml(fr, 'phone');
+  const instrEl = document.getElementById('sim-instruction-text');
+  if (instrEl) instrEl.textContent = fr ? 'Saisissez le numéro de téléphone et appuyez sur Save.' : 'Enter the phone number and click Save.';
+  setTimeout(() => { const inp = document.getElementById('up-phone-input'); if (inp) inp.focus(); }, 50);
+}
+
+function simUpCheckSave() {
+  const inp = document.getElementById('up-phone-input');
+  const btn = document.getElementById('up-save-btn');
+  if (!btn) return;
+  const ok = inp && inp.value.trim().length > 3;
+  btn.disabled = !ok;
+  btn.style.background = ok ? '#1F73B7' : '#C8D0D6';
+  btn.style.cursor = ok ? 'pointer' : 'not-allowed';
+}
+
+function simUpSave() {
+  const inp = document.getElementById('up-phone-input');
+  if (!inp || inp.value.trim().length < 4) return;
+  const ex = window._simExercise;
+  if (!ex || window._simAnswered) return;
+  _simHandleResult(true, ex);
+}
+// ── END USER PROFILE SCENE ──────────────────────────────────────────────────
+
+// ── ORG CREATE SCENE ─────────────────────────────────────────────────────────
+function renderOrgCreateScene(setup, L) {
+  const fr = L === 'fr';
+  window._ocSetup = setup;
+  return buildOrgCreateHtml(fr, 'initial');
+}
+
+function buildOrgCreateHtml(fr, state) {
+  const s = window._ocSetup || {};
+  const userName = s.requester || 'Alex Martin';
+
+  const tabs = `<div style="display:flex;border-bottom:1px solid #D8DCDE;background:white;font-size:12px;flex-shrink:0">
+    <div id="oc-tab" onclick="simOcOpenModal()" style="padding:9px 16px;color:${state==='initial'?'#1F73B7':'#49545C'};font-weight:${state==='initial'?'600':'400'};cursor:pointer;border-bottom:${state==='initial'?'2px solid #1F73B7':'none'}">${fr?'Organisation (créer)':'Organization (create)'}</div>
+    <div style="padding:9px 16px;color:#49545C;cursor:pointer">${userName}</div>
+    <div style="padding:9px 16px;color:#49545C;display:flex;gap:5px;align-items:center"><span style="background:#F79A3E;color:white;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700">New</span>Ticket</div>
+  </div>`;
+
+  const emptyLeft = `<div style="width:190px;flex-shrink:0;padding:14px;border-right:1px solid #D8DCDE;font-size:12px;color:#68737D">
+    <p style="margin:0 0 8px">${fr?'Aucune organisation.':'No organization.'}</p>
+    <div onclick="simOcOpenModal()" style="color:#1F73B7;cursor:pointer;font-size:12px">+ ${fr?'Créer une organisation':'Create organization'}</div>
+  </div>`;
+
+  const placeholder = `<div style="flex:1;display:flex;align-items:center;justify-content:center;color:#68737D;font-size:13px">${fr?'Cliquez sur l\'onglet pour créer une organisation':'Click the tab to create an organization'}</div>`;
+
+  const modal = state === 'modal' ? `<div style="position:absolute;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:10">
+    <div style="background:white;border-radius:8px;padding:28px 28px 20px;width:340px;box-shadow:0 8px 32px rgba(0,0,0,.22)">
+      <div style="font-size:16px;font-weight:700;margin-bottom:18px">${fr?'Ajouter une organisation':'Add new organization'}</div>
+      <div style="margin-bottom:14px">
+        <label style="display:block;font-size:12px;font-weight:600;margin-bottom:4px">${fr?'Nom':'Name'}</label>
+        <input id="oc-name" type="text" style="width:100%;border:1px solid #D8DCDE;border-radius:4px;padding:7px 10px;font-size:13px;box-sizing:border-box;outline:none" oninput="simOcCheck()" onfocus="this.style.borderColor='#1F73B7'" onblur="this.style.borderColor='#D8DCDE'">
+      </div>
+      <div style="margin-bottom:20px">
+        <label style="display:block;font-size:12px;font-weight:600;margin-bottom:2px">Domains</label>
+        <div style="font-size:11px;color:#68737D;margin-bottom:4px">${fr?'Entrez les domaines séparés par un espace. Les emails de ces domaines seront rattachés à l\'organisation.':'Enter domains separated by a space. Emails from these domains will be added to the organization.'}</div>
+        <input id="oc-domain" type="text" placeholder="novatech.com" style="width:100%;border:1px solid #D8DCDE;border-radius:4px;padding:7px 10px;font-size:13px;box-sizing:border-box;outline:none" onfocus="this.style.borderColor='#1F73B7'" onblur="this.style.borderColor='#D8DCDE'">
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:10px">
+        <button style="border:none;background:none;color:#1F73B7;font-size:13px;cursor:pointer;padding:6px 10px">Cancel</button>
+        <button id="oc-add-btn" onclick="simOcCreate()" disabled style="background:#C8D0D6;color:white;border:none;border-radius:4px;padding:7px 20px;font-size:13px;font-weight:600;cursor:not-allowed">Add</button>
+      </div>
+    </div>
+  </div>` : '';
+
+  return `<div style="position:relative;display:flex;flex-direction:column;height:380px;font-size:13px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow:hidden;border:1px solid #D8DCDE;border-radius:4px">
+    ${tabs}
+    <div style="display:flex;flex:1;overflow:hidden">${emptyLeft}${placeholder}</div>
+    ${modal}
+  </div>`;
+}
+
+function simOcOpenModal() {
+  const sim = document.getElementById('zd-sim-area');
+  const fr = window._simL === 'fr';
+  sim.innerHTML = buildOrgCreateHtml(fr, 'modal');
+  const instrEl = document.getElementById('sim-instruction-text');
+  if (instrEl) instrEl.textContent = fr ? 'Entrez le nom de l\'organisation et cliquez sur Add.' : 'Enter the organization name and click Add.';
+  setTimeout(() => { const inp = document.getElementById('oc-name'); if (inp) inp.focus(); }, 50);
+}
+
+function simOcCheck() {
+  const name = document.getElementById('oc-name');
+  const btn  = document.getElementById('oc-add-btn');
+  if (!btn) return;
+  const ok = name && name.value.trim().length > 1;
+  btn.disabled = !ok;
+  btn.style.background = ok ? '#1F73B7' : '#C8D0D6';
+  btn.style.cursor = ok ? 'pointer' : 'not-allowed';
+}
+
+function simOcCreate() {
+  const name = document.getElementById('oc-name');
+  if (!name || name.value.trim().length < 2) return;
+  const ex = window._simExercise;
+  if (!ex || window._simAnswered) return;
+  _simHandleResult(true, ex);
+}
+// ── END ORG CREATE SCENE ─────────────────────────────────────────────────────
+
 function renderSimExercise(exercise, container, L) {
   window._simExercise = exercise;
   window._simL = L;
@@ -1024,6 +1210,8 @@ function renderSimExercise(exercise, container, L) {
   else if (exercise.scene === 'new-ticket') sceneHtml = renderNewTicketScene(exercise.setup || {}, L);
   else if (exercise.scene === 'problem-incident') sceneHtml = renderProblemIncidentScene(exercise.setup || {}, L);
   else if (exercise.scene === 'create-macro') sceneHtml = renderCreateMacroScene(exercise.setup || {}, L);
+  else if (exercise.scene === 'user-profile') sceneHtml = renderUserProfileScene(exercise.setup || {}, L);
+  else if (exercise.scene === 'org-create')   sceneHtml = renderOrgCreateScene(exercise.setup || {}, L);
 
   container.innerHTML = `
     <div class="sim-wrap" style="margin-top:22px">
