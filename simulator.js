@@ -1156,10 +1156,16 @@ function buildOrgCreateHtml(fr, state) {
 
   // Tab bar
   const isTicketActive = state === 'ticket';
-  const tabs = `<div style="display:flex;border-bottom:1px solid #D8DCDE;background:white;font-size:12px;flex-shrink:0">
-    <div style="padding:9px 16px;color:#49545C;cursor:pointer">${userName}</div>
-    <div onclick="simOcOpenModal()" style="padding:9px 16px;color:${isTicketActive?'#49545C':'#1F73B7'};font-weight:${isTicketActive?'400':'600'};cursor:pointer;${isTicketActive?'':'border-bottom:2px solid #1F73B7'}" onmouseover="this.style.color='#1F73B7'" onmouseout="this.style.color='${isTicketActive?'#49545C':'#1F73B7}'">${tabOrg}</div>
-    <div style="padding:9px 16px;color:${isTicketActive?'#1F73B7':'#49545C'};font-weight:${isTicketActive?'600':'400'};display:flex;gap:5px;align-items:center;${isTicketActive?'border-bottom:2px solid #1F73B7':''}"><span style="background:#F79A3E;color:white;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700">New</span>Ticket</div>
+  const orgTabStyle = isTicketActive
+    ? 'padding:9px 16px;color:#49545C;cursor:pointer;font-size:12px'
+    : 'padding:9px 16px;color:#1F73B7;font-weight:600;cursor:pointer;border-bottom:2px solid #1F73B7;font-size:12px';
+  const ticketTabStyle = isTicketActive
+    ? 'padding:9px 16px;color:#1F73B7;font-weight:600;border-bottom:2px solid #1F73B7;display:flex;gap:5px;align-items:center;font-size:12px'
+    : 'padding:9px 16px;color:#49545C;display:flex;gap:5px;align-items:center;font-size:12px';
+  const tabs = `<div style="display:flex;border-bottom:1px solid #D8DCDE;background:white;flex-shrink:0">
+    <div style="padding:9px 16px;color:#49545C;cursor:pointer;font-size:12px">${userName}</div>
+    <div onclick="simOcOpenModal()" style="${orgTabStyle}" onmouseover="this.style.color='#1F73B7'" onmouseout="this.style.color='${isTicketActive ? '#49545C' : '#1F73B7'}'">${tabOrg}</div>
+    <div style="${ticketTabStyle}"><span style="background:#F79A3E;color:white;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700">New</span>Ticket</div>
   </div>`;
 
   // ── TICKET state ──
