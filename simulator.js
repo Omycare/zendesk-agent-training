@@ -1264,6 +1264,278 @@ function simOcCreate() {
 }
 // ── END ORG CREATE SCENE ─────────────────────────────────────────────────────
 
+// ── CREATE VIEW SCENE ────────────────────────────────────────────────────────
+function renderCreateViewScene(setup, L) {
+  window._cvSetup = setup || {};
+  window._cvAllConds = [];
+  window._cvAnyConds = [];
+  window._cvColumns = L === 'fr'
+    ? ['Statut du ticket', 'Sujet', 'Assigné']
+    : ['Ticket status', 'Subject', 'Assignee'];
+  window._cvPickerOpen = false;
+  return buildCreateViewHtml(L === 'fr');
+}
+
+function buildCreateViewHtml(fr) {
+  const viewName = fr ? '🔴 Mes tickets :: Urgents' : '🔴 My tickets :: Urgent';
+
+  const colList = simCvBuildColList(fr);
+
+  const availableCols = fr
+    ? ['Priorité','SLA','Groupe','Demandeur','Date de demande','Mis à jour','ID','Canal','Type','Tags']
+    : ['Priority','SLA','Group','Requester','Request date','Updated','ID','Channel','Type','Tags'];
+  const notAdded = availableCols.filter(c => !window._cvColumns.includes(c));
+  const pickerItems = notAdded.map(c =>
+    '<div onclick="simCvAddCol(\'' + c + '\')" style="padding:7px 12px;font-size:12px;cursor:pointer;border-bottom:1px solid #F3F4F6" onmouseover="this.style.background=\'#F3F4F6\'" onmouseout="this.style.background=\'\'>' + c + '</div>'
+  ).join('');
+
+  const allRows = simCvBuildCondRows('all', fr);
+  const anyRows = simCvBuildCondRows('any', fr);
+
+  const pickerDisplay = window._cvPickerOpen ? 'block' : 'none';
+
+  return '<div style="display:flex;flex-direction:column;height:520px;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif;overflow:hidden;border:1px solid #D8DCDE;border-radius:4px;background:white">'
+    + '<div style="padding:10px 14px;border-bottom:1px solid #D8DCDE;background:#F8F9FB;flex-shrink:0">'
+    +   '<div style="font-size:14px;font-weight:700;color:#2F3941">' + (fr ? 'Créer une vue' : 'Create view') + '</div>'
+    +   '<div style="font-size:11px;color:#68737D">' + (fr ? 'Définissez les conditions et les colonnes de votre vue.' : 'Define the conditions and columns for your view.') + '</div>'
+    + '</div>'
+    + '<div style="flex:1;overflow-y:auto;padding:12px 14px">'
+
+    // View name
+    + '<div style="margin-bottom:12px">'
+    +   '<label style="display:block;font-size:11px;font-weight:600;color:#49545C;text-transform:uppercase;margin-bottom:4px">' + (fr ? 'Nom de la vue*' : 'View name*') + '</label>'
+    +   '<input id="cv-name" type="text" value="' + viewName + '" oninput="simCvCheckSave()" style="width:100%;border:1px solid #D8DCDE;border-radius:4px;padding:6px 10px;font-size:13px;box-sizing:border-box;outline:none" onfocus="this.style.borderColor=\'#1F73B7\'" onblur="this.style.borderColor=\'#D8DCDE\'">'
+    + '</div>'
+
+    // Who has access
+    + '<div style="margin-bottom:12px">'
+    +   '<div style="font-size:11px;font-weight:600;color:#49545C;text-transform:uppercase;margin-bottom:6px">' + (fr ? 'Qui a accès' : 'Who has access') + '</div>'
+    +   '<label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;margin-bottom:3px"><input type="radio" name="cv-access" value="only" checked> ' + (fr ? 'Uniquement moi' : 'Only you') + '</label>'
+    +   '<label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="radio" name="cv-access" value="any"> ' + (fr ? 'Tous les agents' : 'Any agent') + '</label>'
+    + '</div>'
+
+    // Conditions
+    + '<div style="margin-bottom:12px">'
+    +   '<div style="font-size:11px;font-weight:600;color:#49545C;text-transform:uppercase;margin-bottom:3px">' + (fr ? 'Conditions*' : 'Conditions*') + '</div>'
+    +   '<div style="font-size:11px;color:#68737D;margin-bottom:8px">' + (fr ? 'Contrôlez ce qui apparaît en combinant ALL (ET) et ANY (OU).' : 'Control what appears by combining ALL (AND) and ANY (OR) conditions.') + '</div>'
+
+    // ALL section
+    + '<div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:6px;padding:10px 12px;margin-bottom:8px">'
+    +   '<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">'
+    +     '<span style="background:#1F73B7;color:white;font-size:10px;font-weight:700;padding:2px 8px;border-radius:3px">ALL</span>'
+    +     '<span style="font-size:12px;font-weight:600;color:#1E40AF">' + (fr ? 'Satisfaire TOUTES les conditions' : 'Meet ALL of the following conditions') + '</span>'
+    +   '</div>'
+    +   '<div id="cv-all-conds" style="margin-bottom:6px">' + allRows + '</div>'
+    +   '<button onclick="simCvAddCond(\'all\')" style="border:1px solid #1F73B7;background:white;border-radius:20px;padding:4px 11px;font-size:12px;cursor:pointer;color:#1F73B7">+ ' + (fr ? 'Ajouter une condition' : 'Add condition') + '</button>'
+    + '</div>'
+
+    // ANY section
+    + '<div style="background:#FFF8EC;border:1px solid #FCD34D;border-radius:6px;padding:10px 12px">'
+    +   '<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">'
+    +     '<span style="background:#F79A3E;color:white;font-size:10px;font-weight:700;padding:2px 8px;border-radius:3px">ANY</span>'
+    +     '<span style="font-size:12px;font-weight:600;color:#92400E">' + (fr ? 'Satisfaire AU MOINS UNE condition' : 'Meet ANY of the following conditions') + '</span>'
+    +   '</div>'
+    +   '<div id="cv-any-conds" style="margin-bottom:6px">' + anyRows + '</div>'
+    +   '<button onclick="simCvAddCond(\'any\')" style="border:1px solid #F79A3E;background:white;border-radius:20px;padding:4px 11px;font-size:12px;cursor:pointer;color:#F79A3E">+ ' + (fr ? 'Ajouter une condition' : 'Add condition') + '</button>'
+    + '</div>'
+    + '</div>'
+
+    // Columns
+    + '<div style="margin-bottom:12px">'
+    +   '<div style="font-size:11px;font-weight:600;color:#49545C;text-transform:uppercase;margin-bottom:3px">' + (fr ? 'Colonnes' : 'Columns') + ' (' + window._cvColumns.length + ')</div>'
+    +   '<div style="font-size:11px;color:#68737D;margin-bottom:6px">' + (fr ? 'Utilisez ▲▼ pour réordonner.' : 'Use ▲▼ to reorder.') + '</div>'
+    +   '<div id="cv-cols-list">' + colList + '</div>'
+    +   '<div style="position:relative;display:inline-block;margin-top:6px">'
+    +     '<button onclick="simCvTogglePicker()" style="border:1px solid #D8DCDE;background:white;border-radius:4px;padding:5px 11px;font-size:12px;cursor:pointer;color:#49545C">+ ' + (fr ? 'Ajouter une colonne' : 'Add column') + '</button>'
+    +     '<div id="cv-col-picker" style="display:' + pickerDisplay + ';position:absolute;top:100%;left:0;background:white;border:1px solid #D8DCDE;border-radius:4px;box-shadow:0 4px 12px rgba(0,0,0,.12);min-width:160px;z-index:10;max-height:200px;overflow-y:auto">'
+    +       (pickerItems || '<div style="padding:8px 12px;font-size:12px;color:#68737D">' + (fr ? 'Toutes les colonnes ajoutées' : 'All columns added') + '</div>')
+    +     '</div>'
+    +   '</div>'
+    + '</div>'
+
+    + '</div>'
+    // Footer
+    + '<div style="border-top:1px solid #D8DCDE;padding:9px 14px;display:flex;justify-content:flex-end;gap:8px;background:white;flex-shrink:0">'
+    +   '<button style="border:1px solid #D8DCDE;background:white;border-radius:4px;padding:6px 14px;font-size:12px;cursor:pointer;color:#49545C">' + (fr ? 'Annuler' : 'Cancel') + '</button>'
+    +   '<button id="cv-save-btn" onclick="simCvSave()" disabled style="background:#C8D0D6;color:white;border:none;border-radius:4px;padding:6px 18px;font-size:12px;font-weight:600;cursor:not-allowed;transition:background .2s">' + (fr ? 'Enregistrer' : 'Save') + '</button>'
+    + '</div>'
+    + '</div>';
+}
+
+function simCvBuildCondRows(section, fr) {
+  const conds = section === 'all' ? window._cvAllConds : window._cvAnyConds;
+  if (!conds || !conds.length) return '';
+
+  const fieldOpts = fr
+    ? [['','— Champ'],['status','Statut'],['assignee','Assigné'],['priority','Priorité'],['type','Type'],['tag','Tag'],['group','Groupe'],['channel','Canal']]
+    : [['','— Field'],['status','Status'],['assignee','Assignee'],['priority','Priority'],['type','Type'],['tag','Tag'],['group','Group'],['channel','Channel']];
+
+  const valuesByField = fr ? {
+    status:['Ouvert','En attente','En suspens','Résolu'],
+    assignee:['(moi)','(non assigné)'],
+    priority:['Faible','Normale','Haute','Urgente'],
+    type:['Question','Incident','Problème','Tâche'],
+    tag:['urgent','vip','escalade'],
+    group:['Support N1','Technique','SAV'],
+    channel:['Email','Formulaire web','Chat','Téléphone']
+  } : {
+    status:['Open','Pending','On-hold','Solved'],
+    assignee:['(me)','(unassigned)'],
+    priority:['Low','Normal','High','Urgent'],
+    type:['Question','Incident','Problem','Task'],
+    tag:['urgent','vip','escalation'],
+    group:['Level 1 Support','Technical','After-sales'],
+    channel:['Email','Web form','Chat','Phone']
+  };
+
+  return conds.map(function(c, i) {
+    const fieldSel = '<select onchange="simCvUpdateCond(\'' + section + '\',' + i + ',\'field\',this.value)" style="border:1px solid #D8DCDE;border-radius:4px;padding:4px 6px;font-size:12px;background:white">'
+      + fieldOpts.map(function(fo) { return '<option value="' + fo[0] + '"' + (c.field === fo[0] ? ' selected' : '') + '>' + fo[1] + '</option>'; }).join('')
+      + '</select>';
+
+    const vals = c.field && valuesByField[c.field] ? valuesByField[c.field] : [];
+    const valPart = vals.length
+      ? '<span style="font-size:12px;color:#68737D;flex-shrink:0">' + (fr ? 'est' : 'is') + '</span>'
+        + '<select onchange="simCvUpdateCond(\'' + section + '\',' + i + ',\'value\',this.value)" style="border:1px solid #D8DCDE;border-radius:4px;padding:4px 6px;font-size:12px;background:white">'
+        + '<option value="">—</option>'
+        + vals.map(function(v) { return '<option' + (c.value === v ? ' selected' : '') + '>' + v + '</option>'; }).join('')
+        + '</select>'
+      : '';
+
+    return '<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">'
+      + fieldSel + valPart
+      + '<button onclick="simCvRemoveCond(\'' + section + '\',' + i + ')" style="border:none;background:none;cursor:pointer;color:#CC3340;font-size:14px;padding:2px;flex-shrink:0">✕</button>'
+      + '</div>';
+  }).join('');
+}
+
+function simCvBuildColList(fr) {
+  const cols = window._cvColumns;
+  return cols.map(function(col, i) {
+    const upDisabled = i === 0 ? ' disabled' : '';
+    const dnDisabled = i === cols.length - 1 ? ' disabled' : '';
+    return '<div style="display:flex;align-items:center;gap:5px;margin-bottom:4px">'
+      + '<span style="color:#C2C8CC;font-size:13px;cursor:default">⠿</span>'
+      + '<div style="flex:1;border:1px solid #D8DCDE;border-radius:4px;padding:4px 9px;font-size:12px;background:white">' + col + '</div>'
+      + '<div style="display:flex;flex-direction:column">'
+      +   '<button onclick="simCvMoveCol(' + i + ',-1)"' + upDisabled + ' style="border:none;background:none;cursor:pointer;color:#68737D;font-size:10px;padding:1px 3px;line-height:1' + (i===0?';opacity:.3':'') + '">▲</button>'
+      +   '<button onclick="simCvMoveCol(' + i + ',1)"' + dnDisabled + ' style="border:none;background:none;cursor:pointer;color:#68737D;font-size:10px;padding:1px 3px;line-height:1' + (i===cols.length-1?';opacity:.3':'') + '">▼</button>'
+      + '</div>'
+      + '<button onclick="simCvRemoveCol(' + i + ')" style="border:none;background:none;cursor:pointer;color:#CC3340;font-size:13px;padding:2px">✕</button>'
+      + '</div>';
+  }).join('');
+}
+
+function simCvAddCond(section) {
+  if (section === 'all') window._cvAllConds.push({field:'', value:''});
+  else window._cvAnyConds.push({field:'', value:''});
+  const fr = window._simL === 'fr';
+  const el = document.getElementById(section === 'all' ? 'cv-all-conds' : 'cv-any-conds');
+  if (el) el.innerHTML = simCvBuildCondRows(section, fr);
+  simCvCheckSave();
+}
+
+function simCvUpdateCond(section, idx, type, val) {
+  const conds = section === 'all' ? window._cvAllConds : window._cvAnyConds;
+  if (!conds[idx]) return;
+  conds[idx][type] = val;
+  if (type === 'field') conds[idx].value = '';
+  const fr = window._simL === 'fr';
+  const el = document.getElementById(section === 'all' ? 'cv-all-conds' : 'cv-any-conds');
+  if (el) el.innerHTML = simCvBuildCondRows(section, fr);
+  simCvCheckSave();
+}
+
+function simCvRemoveCond(section, idx) {
+  if (section === 'all') window._cvAllConds.splice(idx, 1);
+  else window._cvAnyConds.splice(idx, 1);
+  const fr = window._simL === 'fr';
+  const el = document.getElementById(section === 'all' ? 'cv-all-conds' : 'cv-any-conds');
+  if (el) el.innerHTML = simCvBuildCondRows(section, fr);
+  simCvCheckSave();
+}
+
+function simCvTogglePicker() {
+  window._cvPickerOpen = !window._cvPickerOpen;
+  const picker = document.getElementById('cv-col-picker');
+  if (picker) picker.style.display = window._cvPickerOpen ? 'block' : 'none';
+}
+
+function simCvAddCol(col) {
+  if (window._cvColumns.includes(col)) return;
+  window._cvColumns.push(col);
+  window._cvPickerOpen = false;
+  const fr = window._simL === 'fr';
+  const colsEl = document.getElementById('cv-cols-list');
+  if (colsEl) colsEl.innerHTML = simCvBuildColList(fr);
+  const colCount = document.getElementById('cv-col-count');
+  if (colCount) colCount.textContent = window._cvColumns.length;
+  const picker = document.getElementById('cv-col-picker');
+  if (picker) picker.style.display = 'none';
+  simCvCheckSave();
+}
+
+function simCvRemoveCol(idx) {
+  window._cvColumns.splice(idx, 1);
+  const fr = window._simL === 'fr';
+  const colsEl = document.getElementById('cv-cols-list');
+  if (colsEl) colsEl.innerHTML = simCvBuildColList(fr);
+  simCvCheckSave();
+}
+
+function simCvMoveCol(idx, dir) {
+  const cols = window._cvColumns;
+  const newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= cols.length) return;
+  const tmp = cols[idx]; cols[idx] = cols[newIdx]; cols[newIdx] = tmp;
+  const fr = window._simL === 'fr';
+  const colsEl = document.getElementById('cv-cols-list');
+  if (colsEl) colsEl.innerHTML = simCvBuildColList(fr);
+}
+
+function simCvCheckSave() {
+  const nameEl = document.getElementById('cv-name');
+  const name = nameEl ? nameEl.value.trim() : '';
+  const allFilled = window._cvAllConds.some(function(c) { return c.field && c.value; });
+  const anyFilled = window._cvAnyConds.some(function(c) { return c.field && c.value; });
+  const hasPriority = window._cvColumns.some(function(c) { return c === 'Priority' || c === 'Priorité'; });
+  const canSave = name.length > 0 && allFilled && anyFilled && hasPriority;
+  const btn = document.getElementById('cv-save-btn');
+  if (btn) {
+    btn.disabled = !canSave;
+    btn.style.background = canSave ? '#1F73B7' : '#C8D0D6';
+    btn.style.cursor = canSave ? 'pointer' : 'not-allowed';
+  }
+  // Update instruction dynamically
+  const instrEl = document.getElementById('sim-instruction-text');
+  if (!instrEl) return;
+  const fr = window._simL === 'fr';
+  if (!allFilled) {
+    instrEl.innerHTML = fr
+      ? 'Cliquez sur <strong>+ Ajouter une condition</strong> dans la section bleue <strong>ALL</strong> et sélectionnez un champ + une valeur.'
+      : 'Click <strong>+ Add condition</strong> in the blue <strong>ALL</strong> section and select a field + value.';
+  } else if (!anyFilled) {
+    instrEl.innerHTML = fr
+      ? 'Bien ! Maintenant cliquez sur <strong>+ Ajouter une condition</strong> dans la section orange <strong>ANY</strong>.'
+      : 'Good! Now click <strong>+ Add condition</strong> in the orange <strong>ANY</strong> section.';
+  } else if (!hasPriority) {
+    instrEl.innerHTML = fr
+      ? 'Excellent ! Cliquez sur <strong>+ Ajouter une colonne</strong> et ajoutez la colonne <strong>Priorité</strong>.'
+      : 'Excellent! Click <strong>+ Add column</strong> and add the <strong>Priority</strong> column.';
+  } else {
+    instrEl.innerHTML = fr
+      ? '✅ Tout est prêt ! Cliquez sur <strong>Enregistrer</strong> pour créer la vue.'
+      : '✅ All set! Click <strong>Save</strong> to create the view.';
+  }
+}
+
+function simCvSave() {
+  const ex = window._simExercise;
+  if (!ex || window._simAnswered) return;
+  _simHandleResult(true, ex);
+}
+// ── END CREATE VIEW SCENE ─────────────────────────────────────────────────────
+
 function renderSimExercise(exercise, container, L) {
   window._simExercise = exercise;
   window._simL = L;
@@ -1278,6 +1550,7 @@ function renderSimExercise(exercise, container, L) {
   else if (exercise.scene === 'create-macro') sceneHtml = renderCreateMacroScene(exercise.setup || {}, L);
   else if (exercise.scene === 'user-profile') sceneHtml = renderUserProfileScene(exercise.setup || {}, L);
   else if (exercise.scene === 'org-create')   sceneHtml = renderOrgCreateScene(exercise.setup || {}, L);
+  else if (exercise.scene === 'create-view')  sceneHtml = renderCreateViewScene(exercise.setup || {}, L);
 
   container.innerHTML = `
     <div class="sim-wrap" style="margin-top:22px">
