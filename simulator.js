@@ -1031,7 +1031,7 @@ function buildUserProfileHtml(fr, state) {
     : `<div style="padding:9px 16px;border-bottom:2px solid #1F73B7;color:#1F73B7;font-weight:600;font-size:12px;cursor:default">${userName}</div>`;
   const tabOrg    = `<div style="padding:9px 16px;color:#49545C;font-size:12px;cursor:pointer">${orgName}</div>`;
   const tabTicket = `<div style="padding:9px 16px;color:${state==='ticket'?'#1F73B7':'#49545C'};font-weight:${state==='ticket'?'600':'400'};font-size:12px;display:flex;gap:5px;align-items:center;${state==='ticket'?'border-bottom:2px solid #1F73B7':''}"><span style="background:#CC3340;color:white;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700">Open</span>Ticket #2048</div>`;
-  const tabs = `<div style="display:flex;border-bottom:1px solid #D8DCDE;background:white;flex-shrink:0">${tabUser}${tabOrg}${tabTicket}</div>`;
+  const tabs = `<div style="display:flex;border-bottom:1px solid #D8DCDE;background:white;flex-shrink:0">${tabOrg}${tabUser}${tabTicket}</div>`;
 
   // ── TICKET state ──
   if (state === 'ticket') {
@@ -1163,8 +1163,8 @@ function buildOrgCreateHtml(fr, state) {
     ? 'padding:9px 16px;color:#1F73B7;font-weight:600;border-bottom:2px solid #1F73B7;display:flex;gap:5px;align-items:center;font-size:12px'
     : 'padding:9px 16px;color:#49545C;display:flex;gap:5px;align-items:center;font-size:12px';
   const tabs = `<div style="display:flex;border-bottom:1px solid #D8DCDE;background:white;flex-shrink:0">
-    <div style="padding:9px 16px;color:#49545C;cursor:pointer;font-size:12px">${userName}</div>
     <div onclick="simOcOpenModal()" style="${orgTabStyle}" onmouseover="this.style.color='#1F73B7'" onmouseout="this.style.color='${isTicketActive ? '#49545C' : '#1F73B7'}'">${tabOrg}</div>
+    <div style="padding:9px 16px;color:#49545C;cursor:pointer;font-size:12px">${userName}</div>
     <div style="${ticketTabStyle}"><span style="background:#F79A3E;color:white;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700">New</span>Ticket</div>
   </div>`;
 
