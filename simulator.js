@@ -1221,7 +1221,7 @@ function buildOrgCreateHtml(fr, state) {
         <input id="oc-domain" type="text" placeholder="novatech.com" style="width:100%;border:1px solid #D8DCDE;border-radius:4px;padding:7px 10px;font-size:13px;box-sizing:border-box;outline:none" onfocus="this.style.borderColor='#1F73B7'" onblur="this.style.borderColor='#D8DCDE'">
       </div>
       <div style="display:flex;justify-content:flex-end;gap:10px">
-        <button style="border:none;background:none;color:#1F73B7;font-size:13px;cursor:pointer;padding:6px 10px">Cancel</button>
+        <button onclick="simOcCancel()" style="border:none;background:none;color:#1F73B7;font-size:13px;cursor:pointer;padding:6px 10px">Cancel</button>
         <button id="oc-add-btn" onclick="simOcCreate()" disabled style="background:#C8D0D6;color:white;border:none;border-radius:4px;padding:7px 20px;font-size:13px;font-weight:600;cursor:not-allowed">Add</button>
       </div>
     </div>
@@ -1236,6 +1236,13 @@ function simOcOpenModal() {
   const instrEl = document.getElementById('sim-instruction-text');
   if (instrEl) instrEl.textContent = fr ? 'Entrez le nom de l\'organisation et cliquez sur Add.' : 'Enter the organization name and click Add.';
   setTimeout(() => { const inp = document.getElementById('oc-name'); if (inp) inp.focus(); }, 50);
+}
+
+function simOcCancel() {
+  const fr = window._simL === 'fr';
+  document.getElementById('zd-sim-area').innerHTML = buildOrgCreateHtml(fr, 'ticket');
+  const instrEl = document.getElementById('sim-instruction-text');
+  if (instrEl) instrEl.innerHTML = fr ? 'Cliquez sur l\'onglet <strong>Organisation (créer)</strong> pour créer l\'organisation du client.' : 'Click the <strong>Organization (create)</strong> tab to create the customer\'s organization.';
 }
 
 function simOcCheck() {
