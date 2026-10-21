@@ -1277,7 +1277,7 @@ function renderCreateViewScene(setup, L) {
 }
 
 function buildCreateViewHtml(fr) {
-  const viewName = fr ? '🔴 Mes tickets :: Urgents' : '🔴 My tickets :: Urgent';
+  const viewName = fr ? 'Mes tickets :: 🔴 Urgents' : 'My tickets :: 🔴 Urgent';
 
   const colList = simCvBuildColList(fr);
 
